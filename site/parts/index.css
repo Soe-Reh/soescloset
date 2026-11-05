@@ -1,0 +1,97 @@
+/* Chrome: spans every room. No bar, fade or blur, so nothing ever sits on a garment but the letters themselves. */
+body>.chrome{position:fixed;z-index:20;color:var(--ink);pointer-events:none}
+body>.chrome a{pointer-events:auto;transition:color .18s linear}
+/* Over the black-on-paper index the words invert only where they cross a letter. */
+body>.chrome.over{color:#fff;mix-blend-mode:difference}
+/* Beats tint the nav inline; none of that may survive onto the sheet. */
+body>.chrome.over a,body>.chrome.end a,body>.chrome.over nav,body>.chrome.end nav,body>.chrome.mast a,body>.chrome.mast nav{color:inherit!important}
+/* From the wall to the splice the words stand on a band of the page's own paper, so nothing passing under them can strike them. */
+body>.chrome.mast{color:var(--black)}
+#mast{position:absolute;z-index:8;left:0;right:0;top:0;height:52px;background:var(--paper);pointer-events:none;visibility:hidden}
+@media (max-width:760px){#mast{height:46px}}
+body>.chrome.end{color:var(--accent)}
+#nav a,#nav a.on{border-color:transparent}
+
+#index[hidden]{display:none}
+#index{position:relative;z-index:2;background:var(--paper);color:var(--black)}
+#ixhead{display:flex;justify-content:space-between;padding:96px 20px 28px}
+#ixhead h2{font:inherit}
+#ixrows{list-style:none;padding:0 20px}
+.ixrow{position:relative;display:grid;grid-template-columns:44px 1fr 30vw;gap:clamp(14px,3svh,30px) 12px;padding:9px 0 calc(var(--ixfs,15vw)*.05)}
+.ixrow::before{content:"";position:absolute;left:0;right:0;top:0;height:1px;background:var(--black);transform-origin:0 0;transition:transform 1.1s cubic-bezier(.22,1,.36,1)}
+.ixl{padding-top:1px}
+.ixn{grid-row:2;grid-column:1/-1;overflow:hidden;font-size:var(--ixfs,15vw);padding:.05em 0 .022em;margin-bottom:-.05em;line-height:.9}
+.ixn a{display:block;width:max-content;max-width:100%;white-space:nowrap}
+.ixn span{display:block;transition:transform .45s cubic-bezier(.22,1,.36,1),opacity .5s ease}
+.ixp{grid-row:1;grid-column:3;list-style:none;transition:opacity .5s ease}
+.ixp a{scroll-margin:64px;display:grid;grid-template-columns:26px 1fr auto;gap:0 8px;padding:1px 0 3px}
+.ixp img{display:none}
+.num{font-variant-numeric:tabular-nums}
+.ixp b{font-weight:400;grid-column:1}
+.ixp span{transition:opacity .3s ease}
+
+/* One row answers: everything else steps back, its name leans toward the piece. */
+#ixrows.live .ixrow:not(.act) .ixn span{opacity:.2}
+#ixrows.live .ixrow:not(.act) .ixp{opacity:.55}
+#ixrows.live .ixrow.act .ixn span{transform:translateX(14px)}
+#ixrows.live .ixrow.act .ixp a:not(.act){opacity:.6}
+
+/* Rows arrive with the scroll: the rule draws, then the name rises out of its own line. */
+#index.rv .ixrow:not(.in)::before{transform:scaleX(0)}
+#index.rv .ixrow:not(.in) .ixn span{transform:translateY(104%);transition:none}
+#index.rv .ixrow:not(.in) .ixp,#index.rv .ixrow:not(.in) .ixl{opacity:0}
+#index.rv .ixrow.in .ixn span{animation:ix-rise 1s cubic-bezier(.22,1,.36,1) backwards}
+#index.rv .ixrow.in .ixl{transition:opacity .6s .25s}
+#index.rv .ixrow.in .ixp{transition:opacity .6s .25s}
+@keyframes ix-rise{from{transform:translateY(104%)}}
+
+/* The reel. Its position restarts one 500ms transition per pointer move, so quick moves trail softly. */
+#reel{position:fixed;left:0;top:0;z-index:5;width:var(--rs);height:var(--rs);--rs:min(52svh,640px);pointer-events:none;transition:transform .5s cubic-bezier(.22,1,.36,1);will-change:transform}
+#reelT{position:absolute;inset:0;transform-origin:50% 6.25%}
+#reelS{position:absolute;inset:0;overflow:hidden;opacity:0;transform:scale(.72);transform-origin:50% 40%;transition:transform .4s cubic-bezier(.22,1,.36,1),opacity .24s linear}
+#reel.on #reelS{opacity:1;transform:none}
+.rsl{position:absolute;inset:0;visibility:hidden;will-change:transform}
+.rsl.on{visibility:visible}
+.rsl img{position:absolute;inset:0;width:100%;height:100%}
+
+/* Ending: the opening's room and wordmark, its doors now closing, with everything on one rail by price. */
+#end{position:relative;height:240svh}
+#endPin{position:sticky;top:0;height:100svh;overflow:hidden;contain:strict;container-type:size;color:var(--accent)}
+#endRail{position:absolute;left:0;right:0;top:0;height:1px;background:currentColor;transform-origin:0 0}
+.eg{position:absolute;left:0;top:0;will-change:transform}
+.eg img{position:absolute;inset:0;width:100%;height:100%;display:block}
+#endW{position:absolute;left:0;top:0;white-space:nowrap;line-height:.82;overflow:hidden;padding-top:.02em;transform-origin:0 0;
+  font-size:calc(98.5cqw/var(--wm));transform:translate(.75cqw,calc(100cqh - .84em - 34px))}
+#endW span{display:inline-block;will-change:transform}
+.endT{position:absolute;white-space:nowrap}
+#endLo{left:20px}#endHi{right:20px}
+#endN{position:absolute;left:20px;right:20px;bottom:10px;display:flex;justify-content:space-between;gap:20px}
+@container (max-aspect-ratio:20/23){
+  #endW{font-size:calc((100cqh - 190px)/var(--wm));transform:translate(calc((100cqw + .84em)/2),112px) rotate(90deg)}
+  #endN{flex-direction:column;gap:0}
+}
+#endN p+p{text-align:right}
+@container (max-aspect-ratio:20/23){#endN p+p{text-align:left}}
+
+@media (max-width:760px),(hover:none){
+  #reel{display:none}
+  .ixrow{grid-template-columns:1fr;padding-bottom:30px}
+  .ixl{position:absolute;right:0;top:9px}
+  .ixn{grid-row:auto;margin-top:18px;margin-bottom:10px}
+  .ixp{grid-row:auto;grid-column:auto}
+  /* No hover here, so the reel's cutouts stand in the row: one size for every piece, whatever it costs. */
+  .ixp{display:grid;grid-template-columns:1fr 1fr;gap:18px 12px}
+  .ixp a{display:block;padding:0}
+  .ixp img{display:block;width:100%;aspect-ratio:1;object-fit:cover;object-position:50% 40%}
+  .ixp b{display:block;margin-top:4px}
+  .ixp span{display:block}
+}
+@media (prefers-reduced-motion:reduce){
+  #reel,#reelS,.ixn span,.ixp,.ixrow::before{transition:none!important}
+  .ixn span{animation:none!important}
+}
+
+/* Seams between beats. A hidden parent does not hide children that set their own visibility, so a fast scroll could leave the hood's rooms stuck on screen behind later beats. */
+#hrooms[style*="hidden"]>*,#strip[style*="hidden"]>*{visibility:hidden!important}
+
+#ixnote{max-width:46ch;margin:48px 20px 32px;font-size:13px;line-height:1.5;opacity:.7}

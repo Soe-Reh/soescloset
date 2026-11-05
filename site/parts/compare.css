@@ -1,0 +1,54 @@
+.door{position:absolute;inset:0;visibility:hidden;transition:background-color .5s}
+#run,#runF,#mult{left:0;top:0;line-height:.9;color:var(--black);transform-origin:0 0}
+#run,#mult{z-index:3}
+#fwin{position:absolute;inset:0;z-index:6;overflow:hidden;pointer-events:none;visibility:hidden}
+#runF{visibility:inherit}
+.bare .g .sh{visibility:hidden}
+/* Not #tags/.tag: those belong to the walk, and its tie line was piercing these labels. */
+#ptags{position:absolute;inset:0;z-index:5;pointer-events:none}
+.ptag{position:absolute;left:0;top:0;line-height:14px;font-size:12px;visibility:hidden;color:var(--black)}
+.ptag strong{display:block;font-weight:400;text-transform:uppercase}
+#nPrice,#nGap{left:20px;bottom:auto;top:64px;color:var(--black);max-width:250px}
+/* The spread: both prices at one height, each cut by the seam with its page. */
+#pa,#pb{left:0;top:0;line-height:.9;transform-origin:0 0}
+#seam{position:absolute;z-index:7;top:0;bottom:0;left:0;width:1px;visibility:hidden}
+#times{z-index:8;left:0;top:0;padding:3px 8px;background:var(--paper);color:var(--black);transition:scale .35s var(--ease);font-variant-numeric:tabular-nums}
+#times.held{scale:1.22 .86}
+#seamKey{position:absolute;z-index:9;left:0;top:0;width:96px;height:26px;opacity:0;visibility:hidden;appearance:none;background:none;cursor:ew-resize}
+#seamKey:focus-visible{opacity:1;outline:2px solid currentColor;outline-offset:2px;color:var(--black)}
+.cap{position:absolute;z-index:8;top:60px;visibility:hidden}
+.cap strong{display:block;font-weight:400;text-transform:uppercase}
+#capA{left:84px}#capB{right:84px;text-align:right}
+/* The rack: a column of real cutouts in price order, packed so sleeves overlap. */
+.pick{position:absolute;z-index:8;top:60px;bottom:16px;width:52px;display:flex;flex-direction:column;visibility:hidden}
+#pickA{left:16px}#pickB{right:16px}
+.pick button{position:relative;flex:1 1 0;min-height:0;display:block;transition:scale .28s var(--ease);transform-origin:center}
+#pickA button{transform-origin:left center}#pickB button{transform-origin:right center}
+.pick img{position:absolute;left:50%;top:50%;width:58px;height:58px;margin:-29px 0 0 -29px;pointer-events:none;user-select:none;-webkit-user-drag:none}
+.pick b{position:absolute;top:50%;translate:0 -50%;font-weight:400;white-space:nowrap;background:var(--paper);color:var(--black);padding:3px 7px;opacity:0;pointer-events:none;box-shadow:0 0 0 1px rgba(0,0,0,.08)}
+#pickA b{left:calc(100% + 8px)}#pickB b{right:calc(100% + 8px)}
+.pick button[aria-pressed=true]::after{content:"";position:absolute;top:50%;width:9px;height:1px;background:currentColor}
+#pickA button[aria-pressed=true]::after{left:-12px}#pickB button[aria-pressed=true]::after{right:-12px}
+@media (hover:hover){
+  .pick button:hover{scale:2.3;z-index:3}
+  .pick button:hover b{opacity:1;scale:.435}
+  #pickA button:hover b{transform-origin:left center}#pickB button:hover b{transform-origin:right center}
+  .pick button:has(+button:hover),.pick button:hover+button{scale:1.45;z-index:2}
+}
+.pick button:focus-visible{scale:2.3;z-index:3;outline-offset:-2px}
+.pick button:focus-visible b{opacity:1;scale:.435}
+@media (max-width:760px){
+  /* The skyline's dearest piece fills the phone, so the sentence needs its own paper. */
+  #nGap{background:var(--paper);padding:4px 6px;max-width:calc(100% - 40px)}
+  #capA{left:20px}#capB{right:20px}
+  .cap{top:50px}
+  /* Phone: two thumb rails under the spread. Horizontal pan belongs to the rail here, not the seam. */
+  .pick{top:auto;bottom:auto;left:0!important;right:0!important;width:auto;height:46px;flex-direction:row;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;padding:0 12px;touch-action:pan-x}
+  .pick::-webkit-scrollbar{display:none}
+  #pickA{bottom:52px}#pickB{bottom:6px}
+  .pick button{flex:0 0 44px;height:46px}
+  .pick img{width:50px;height:50px;margin:-25px 0 0 -25px}
+  .pick b{display:none}
+  #pickA button[aria-pressed=true]::after,#pickB button[aria-pressed=true]::after{left:16px;right:auto;top:auto;bottom:0;width:12px}
+}
+@media (prefers-reduced-motion:reduce){.door,.pick button,#times{transition:none}}

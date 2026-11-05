@@ -1,0 +1,31 @@
+/* Plaster and the rack layers live inside the garment stack; the rest is plain type on the paper around the wall. */
+.g canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;visibility:hidden}
+#stage.wall-grab{cursor:grab}
+#stage.wall-held{cursor:grabbing}
+#stage.wall-held *{user-select:none;-webkit-user-select:none}
+.rack{position:absolute;left:-24px;top:-24px;width:calc(100% + 48px);height:calc(100% + 48px);z-index:200;pointer-events:none;visibility:hidden;transform-origin:50% 50%}
+#rack1{filter:blur(3px)}#rack2{filter:blur(9px)}
+#wallBig{position:absolute;z-index:250;left:0;top:0;width:max-content;pointer-events:none;visibility:hidden;white-space:nowrap;color:var(--black)}
+#wallRule{position:absolute;z-index:6;right:0;top:0;pointer-events:none;visibility:hidden;font-variant-numeric:tabular-nums;font-size:12px;line-height:14px}
+#nWall{max-width:400px}
+#wallRule i{position:absolute;right:0;left:0;height:1px;background:var(--black);transform-origin:0 0}
+#wallRule span{position:absolute;right:6px;transform:translateY(3px)}
+#wallMark{position:absolute;z-index:6;left:0;top:0;width:100px;height:1px;background:var(--black);box-shadow:0 1px 0 rgba(246,246,244,.55);transform-origin:0 0;pointer-events:none;visibility:hidden}
+#wallCap{position:absolute;z-index:9;left:0;display:flex;align-items:flex-end;gap:10px;pointer-events:none;visibility:hidden;white-space:nowrap}
+#wallCap b{font-size:var(--capfs,70px);line-height:.9;margin-bottom:-.04em}
+#wallCap strong{font-weight:400;text-transform:uppercase}
+#wallSort{position:fixed;z-index:2;left:50%;top:14px;transform:translateX(-50%);display:flex;gap:14px;visibility:hidden}
+#wallSort button{padding:2px 0;border-bottom:1px solid transparent}
+#wallSort button[aria-pressed=true]{border-color:currentColor}
+/* Keyboard twin of the pointer: never painted, so the wall stays bare. Focus draws #wallRing on the slit it opens. */
+#wallKey{position:fixed;z-index:2;right:20px;bottom:18px;width:120px;opacity:0;pointer-events:none}
+#wallRing{position:absolute;z-index:8;left:0;top:0;transform-origin:0 0;border:2px solid var(--black);box-shadow:inset 0 0 0 1px var(--paper);pointer-events:none;visibility:hidden}
+@media (max-width:760px){
+  #wallSort{left:auto;top:auto;right:34px;bottom:2px;transform:none;flex-direction:column;gap:0;text-align:right}
+  #wallSort button{padding:7px 0 7px 16px;border:0;text-underline-offset:3px}
+  #wallSort button[aria-pressed=true]{text-decoration:underline}
+  #wallCap{left:16px;right:72px}#wallCap span{white-space:normal;min-width:0}
+  #nWall{max-width:calc(100% - 110px);left:16px;bottom:10px}
+  /* The phone rail pans under the ruler, so the ruler stands on its own paper. */
+  #wallRule{font-size:11px}#wallRule::before{content:"";position:absolute;inset:0 0 -200px;background:var(--paper)}#wallRule span{right:3px}
+}

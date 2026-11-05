@@ -1,0 +1,84 @@
+@font-face{font-family:Six;src:url(fonts/six-caps-latin-400-normal.woff2) format("woff2");font-display:block}
+@font-face{font-family:Arc;src:url(fonts/archivo-latin-wdth-normal.woff2) format("woff2");font-weight:100 900;font-stretch:62% 125%;font-display:swap}
+/* --wm: width of SOESCLOSET per 1px of Six Caps, so the wordmark fits in pure CSS on the first frame. */
+:root{--paper:#f6f6f4;--black:#0b0b0b;--ground:#5c2430;--ink:#f6f1e6;--accent:#ebe3b8;--ease:cubic-bezier(.16,1,.3,1);--wm:2.1875}
+/* A deep link's first frame is the paper its beat ends on, not the opening's colour. */
+html[data-land]:not([data-land=""],[data-land=walk]){--ground:var(--paper);--ink:var(--black)}
+*{box-sizing:border-box;margin:0;padding:0}
+/* No room scrolls the page; only the index does, and it sets .ix. */
+html{background:var(--ground);-webkit-text-size-adjust:100%;height:100%;overflow:hidden}
+html.ix{height:auto;overflow:auto;background:var(--paper)}
+body{font:400 13px/17px Arc,"Helvetica Neue",Arial,sans-serif;letter-spacing:.002em;color:var(--black);background:var(--paper);overflow-x:clip;-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}
+button{all:unset;cursor:pointer}
+:focus-visible{outline:2px solid currentColor;outline-offset:2px}
+.six{font-family:Six,Impact,sans-serif;font-weight:400;letter-spacing:0;line-height:.9;text-transform:uppercase}
+
+main>section:not(#index){position:absolute;width:0;height:0}
+#stage{position:fixed;left:0;top:0;width:100%;z-index:1;height:100svh;overflow:hidden;color:var(--ink);touch-action:pinch-zoom;contain:strict;container-type:size}
+.ix #stage{clip-path:inset(0 0 100% 0)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+#ground{position:absolute;inset:0;background:var(--ground)}
+#gs{position:absolute;inset:0;z-index:4}
+.g{position:absolute;left:0;top:0;width:1600px;height:1600px;transform-origin:0 0;will-change:transform;visibility:hidden}
+.g img{position:absolute;inset:0;width:100%;height:100%;display:block;user-select:none;-webkit-user-drag:none;pointer-events:none}
+
+.big{position:absolute;pointer-events:none;white-space:nowrap;visibility:hidden}
+.chrome{position:absolute;z-index:9;left:20px;right:20px;top:14px;display:flex;justify-content:space-between;align-items:baseline}
+#logo{font:400 36px/1 Six,Impact,sans-serif;letter-spacing:.03em;text-transform:uppercase}
+nav{display:flex;gap:16px}
+#navBtn{display:none}
+nav a{padding:2px 0;border-bottom:1px solid transparent;font-size:13px;font-weight:600;font-stretch:75%;letter-spacing:.07em;text-transform:uppercase}
+.note{position:absolute;z-index:9;max-width:300px;left:20px;bottom:18px;visibility:hidden}
+/* The same swing tag as the rail, tied beside the hood so it never lands on a print. */
+#hov{position:absolute;z-index:10;left:0;top:0;width:128px;pointer-events:none;visibility:hidden;background:var(--paper);color:var(--black);padding:18px 10px 10px;font-size:12px;line-height:14px;font-weight:500;font-stretch:75%;clip-path:polygon(20% 0,80% 0,100% 14px,100% 100%,0 100%,0 14px);transform-origin:50% 0}
+#hov small{display:block;font-size:11px;font-weight:600;letter-spacing:.09em;text-transform:uppercase}
+#hov b{display:block;margin:2px 0 6px;font-size:46px;line-height:.92}
+
+
+/* The sideways scroller stands over the garments and moves nothing itself: its scrollLeft is the room's position. */
+.mover{position:absolute;inset:0;z-index:5;overflow:auto hidden;scroll-snap-type:x mandatory;overscroll-behavior:contain;scrollbar-width:none;touch-action:pan-x pinch-zoom;cursor:grab;user-select:none;-webkit-user-select:none;visibility:hidden}
+.mover::-webkit-scrollbar{display:none}
+.mover.on{visibility:visible}
+.mover.free{scroll-snap-type:none}
+.mover.drag{cursor:grabbing!important}
+.mover>div{display:flex;width:max-content;height:100%}
+.slot{position:relative;flex:none;width:var(--p);height:100%;scroll-snap-align:start;scroll-snap-stop:always}
+.slot:last-child{width:100cqw}
+.slot button{position:absolute;left:var(--bx);top:var(--by);width:var(--bw);height:var(--bh);pointer-events:none}
+.slot button:focus-visible{outline:2px solid var(--black);outline-offset:0;box-shadow:0 0 0 2px var(--paper),inset 0 0 0 2px var(--paper)}
+/* Position stands on its own paper, so it reads on any room's colour. */
+.pos{position:absolute;z-index:9;right:20px;bottom:18px;display:flex;align-items:center;height:40px;background:var(--paper);color:var(--black);font-size:12px;font-weight:600;font-stretch:75%;letter-spacing:.07em;text-transform:uppercase;font-variant-numeric:tabular-nums;white-space:nowrap;visibility:hidden}
+.pos.on{visibility:visible}
+.pos small{padding:0 12px;font:inherit;font-weight:400;letter-spacing:.02em;text-transform:none}
+.pos.moved small{display:none}
+.pos i{position:relative;width:clamp(60px,10cqw,140px);height:1px;margin:0 6px;background:rgba(11,11,11,.3)}
+.pos i::after{content:"";position:absolute;left:0;top:-1px;width:100%;height:3px;background:var(--black);transform:scaleX(var(--at,0));transform-origin:0 0}
+.pos button{display:flex;align-items:center;justify-content:center;min-width:44px;height:40px;padding:0 10px;text-align:center}
+.pos button:focus-visible{outline-offset:-2px}
+.pos button[disabled]{opacity:.25;cursor:default}
+.pos b{font-weight:600;padding:0 2px}
+.pos svg{width:16px;height:10px;fill:none;stroke:currentColor;stroke-width:1.2}
+#hair{position:absolute;left:0;top:0;width:1px;height:2px;background:currentColor;transform-origin:0 0;transform:scaleX(0);pointer-events:none;transition:transform .55s var(--ease)}
+.stage-in{animation:slit-in .55s var(--ease) both}
+@keyframes slit-in{from{clip-path:inset(0 50%)}to{clip-path:inset(0 0)}}
+/* A room opens from a slit over the one it replaces; only the garment both rooms share flies between them. */
+::view-transition-old(root){animation:none;opacity:1}
+::view-transition-new(root){animation:slit-in .62s var(--ease) both}
+::view-transition-group(carry){animation-duration:.62s;animation-timing-function:var(--ease);z-index:2}
+
+@media (max-width:760px){
+  #logo{font-size:30px;position:relative;z-index:1}
+  /* Seven words never fit beside the name: the phone gets the room's own name, and all of them as a poster when asked. */
+  #navBtn{display:flex;position:relative;z-index:1;align-items:center;gap:8px;min-height:44px;margin:-12px 0;font-size:13px;font-weight:600;font-stretch:75%;letter-spacing:.07em;text-transform:uppercase;pointer-events:auto}
+  #navBtn::after{content:"";width:11px;height:7px;border-block:1px solid currentColor}
+  #navBtn[aria-expanded=true]::after{height:0;border-bottom:0}
+  nav{display:none;position:fixed;inset:0;height:100svh;padding:64px 20px 20px;flex-direction:column;background:var(--paper);overflow:auto}
+  nav.open{display:flex}
+  nav a{display:flex;align-items:center;flex:1 1 0;min-height:48px;max-height:84px;padding:0;border-top:1px solid var(--black);color:var(--black)!important;font:400 clamp(44px,8svh,64px)/1 Six,Impact,sans-serif;letter-spacing:.02em}
+  #chrome:has(nav.open){mix-blend-mode:normal;pointer-events:auto}
+  #chrome:has(nav.open) #logo,#chrome:has(nav.open) #navBtn{color:var(--black)!important}
+  #hair{display:none}
+  .pos{left:16px;right:16px;bottom:12px}.pos i{flex:1;width:auto}.pos small{display:none}
+}
+@media (prefers-reduced-motion:reduce){#hair{transition:none}.stage-in{animation:none}}

@@ -1,0 +1,61 @@
+/* The piece's own colour room, not a scrim: nothing dims, the sheet is the garment's ground. */
+#pv{position:fixed;inset:0;width:100vw;height:100svh;max-width:none;max-height:none;margin:0;border:0;padding:0;background:none;color:var(--pi);overflow:hidden auto;overscroll-behavior:contain;font-size:14px;line-height:19px}
+#pv:not([open]){display:none}
+#pv::backdrop{background:none}
+#pv svg{fill:none;stroke:currentColor;stroke-width:1.2}
+.pv-bg{position:fixed;inset:0;background:var(--pr)}
+.pv-stage{position:fixed;left:0;top:0;width:58vw;height:100svh;touch-action:pinch-zoom}
+.pv-g{--c:min(106svh,58vw);position:absolute;left:calc(29vw - var(--c)/2);top:calc(50svh - var(--c)*.52);width:var(--c);height:var(--c);user-select:none;-webkit-user-drag:none}
+.two .pv-g{--c:min(70svh,31vw);left:calc(15vw - var(--c)/2)}
+.two .pv-o{left:calc(43vw - var(--c)/2)}
+.pv-panel{position:relative;margin-left:58vw;min-height:100svh;padding:72px 28px 88px 8px;display:flex;flex-direction:column;align-items:flex-start;gap:12px}
+.pv-brand{font-weight:600;font-stretch:75%;letter-spacing:.07em;text-transform:uppercase}
+.pv-name{outline:0;font:inherit;font-size:17px;line-height:22px;max-width:30em}
+.pv-price{font-size:clamp(96px,17svh,180px);line-height:.9;margin:6px 0 2px;padding-bottom:.16em} /* the $ falls below the line */
+.two .pv-price{font-size:clamp(72px,11svh,120px)}
+.pv-notes{width:100%;max-width:440px;list-style:none;font-size:13px;line-height:18px}
+.pv-notes[hidden]{display:none}
+.pv-notes li::before{content:"\2013\00a0";opacity:.6}
+.pv-line{display:block;position:relative;width:96px;max-width:100%;height:1px;margin:5px 0 3px auto;background:currentColor;opacity:.9}
+.pv-line::after{content:"";position:absolute;left:calc(var(--x)*(100% - 3px));top:-3px;width:3px;height:7px;background:currentColor}
+.pv-go{display:flex;flex-wrap:wrap;gap:8px;width:100%;max-width:440px}
+.pv-go a{flex:1 1 180px;display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:48px;padding:0 14px;background:var(--pi);color:var(--pr);font-weight:600;font-stretch:88%}
+.pv-go a:hover{text-decoration:underline;text-underline-offset:3px;text-decoration-thickness:1px}
+.pv-go svg{width:10px;height:10px;flex:none}
+.pv-go a:focus-visible,.pv-x:focus-visible,.pv-nav button:focus-visible,.pv-cbtn:focus-visible,.pv-room:focus-visible,.pv-picks button:focus-visible{outline:2px solid currentColor;outline-offset:2px}
+.pv-facts{width:100%;max-width:440px;border-collapse:collapse;font-variant-numeric:tabular-nums}
+.pv-facts tr{border-top:1px solid currentColor}
+.pv-facts tr:last-child{border-bottom:1px solid currentColor}
+.pv-facts th{font-weight:400;text-align:left;padding:5px 12px 5px 0;white-space:nowrap}
+.pv-facts td{padding:5px 0;text-align:right;vertical-align:top}
+.pv-facts td+td{padding-left:14px}
+.pv-facts strong{font-weight:600}
+.pv-small{max-width:440px;font-size:12px;line-height:16px;opacity:.78}
+.pv-cbtn{padding:12px 0;font-weight:600;font-stretch:88%;text-decoration:underline;text-underline-offset:3px;text-decoration-thickness:1px}
+.pv-picks{display:flex;gap:2px;width:100%;max-width:440px;overflow:auto hidden;scrollbar-width:thin;padding:0 48px 4px 0;scroll-margin-bottom:64px;mask-image:linear-gradient(90deg,#000 calc(100% - 48px),transparent)}
+.pv-cbtn[aria-expanded=true]::after{content:", pick one, scroll for more \2192";text-decoration:none;display:inline-block;margin-left:.25em;font-weight:400}
+.pv-picks[hidden]{display:none}
+.pv-picks button{flex:0 0 100px;display:block;font-size:11px;line-height:14px;padding-bottom:4px;border-bottom:2px solid transparent}
+.pv-picks button[hidden]{display:none}
+.pv-picks button[aria-pressed=true]{border-color:currentColor}
+.pv-picks img{display:block;width:84px;height:84px}
+.pv-room{min-height:44px;display:flex;align-items:center;text-decoration:underline;text-underline-offset:3px;text-decoration-thickness:1px}
+.pv-room[hidden]{display:none}
+.pv-x{position:fixed;right:18px;top:12px;min-height:44px;min-width:44px;display:flex;align-items:center;justify-content:center;padding:0 10px;font-weight:600;font-stretch:75%;letter-spacing:.07em;text-transform:uppercase;font-size:13px}
+.pv-nav{position:fixed;left:18px;bottom:14px;display:flex;align-items:center;font-variant-numeric:tabular-nums;font-weight:600;font-stretch:75%;letter-spacing:.07em}
+.pv-nav button{display:flex;align-items:center;justify-content:center;width:48px;height:44px}
+.pv-nav svg{width:18px;height:10px}
+@media (max-width:760px){
+  /* Phone: the garment first, whole, then everything else under it. The sheet scrolls; the nav and close stay put. */
+  .pv-bg{position:fixed}
+  .pv-stage{position:relative;width:100%;height:calc(100vw*.98);max-height:56svh}
+  .pv-g{--c:min(100vw,58svh);left:calc(50% - var(--c)/2);top:0}
+  .two .pv-stage{height:64vw}
+  .two .pv-g{--c:50vw;left:0;top:12vw}
+  .two .pv-o{left:50vw}
+  .pv-panel{margin:0;min-height:0;padding:6px 16px 84px}
+  .pv-price{font-size:96px}
+  .pv-go,.pv-facts,.pv-small,.pv-picks{max-width:none}
+  .pv-x{right:6px;top:4px}
+  .pv-nav{left:0;right:0;bottom:0;justify-content:space-between;padding:0 6px;background:var(--pr)}
+}

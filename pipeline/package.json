@@ -1,0 +1,1 @@
+{"name":"soescloset-pipeline","private":true,"type":"module","dependencies":{"@fontsource-variable/archivo":"^5.3.0","@fontsource/courier-prime":"^5.3.0","@fontsource/league-gothic":"^5.3.0","@fontsource/six-caps":"^5.3.0","@imgly/background-removal-node":"^1.4.5","sharp":"^0.35.5"}}

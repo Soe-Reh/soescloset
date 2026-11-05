@@ -1,0 +1,28 @@
+#word{z-index:1;left:0;top:0;color:var(--black);line-height:.82;transform-origin:0 0}
+/* Not .door: compare.css owns that name. */
+.half{display:inline-block;clip-path:inset(-3% -1% -7% -1%)}
+.half i{display:inline-block;font-style:normal}
+#mp{left:0;top:0;z-index:160;color:var(--paper);overflow:hidden;line-height:.9}
+#mp i{display:block;font-style:normal}
+.meanC{position:absolute;left:0;top:0;pointer-events:none;visibility:hidden}
+/* Padding keeps the round numerals' overshoot inside the mask. */
+#ea,#eb{z-index:6;top:64px;color:var(--black);overflow:hidden;line-height:.86;padding-bottom:.06em}
+#ea i,#eb i{display:inline-block;font-style:normal}
+#ea{left:20px}#eb{right:20px}
+.rule{position:absolute;z-index:5;top:0;left:0;width:1px;height:100%;background:var(--black);transform-origin:0 0;visibility:hidden}
+.rulelab{position:absolute;z-index:7;visibility:hidden;color:var(--black)}
+#l1{left:20px}#l2{right:20px;text-align:right}
+a.rulelab:hover{text-decoration:underline;text-underline-offset:2px;text-decoration-thickness:1px}
+.rulelab b{font-weight:400;text-transform:uppercase}
+#nMean,#nStat,#nExt{bottom:66px;color:var(--black);font-variant-numeric:tabular-nums}
+#nStat{left:auto;right:20px;text-align:right;max-width:none}
+#nStat span{margin-left:22px}
+#nStat i{display:inline-block;width:9px;height:9px;margin-right:5px}
+@container (max-aspect-ratio:20/23){
+  #eb{left:20px;right:auto}
+  #l1,#l2{left:auto;right:20px;max-width:30%;text-align:right}
+  .rulelab .nm{display:none}
+  #nMean{max-width:46%}
+  #nStat{max-width:46%}
+  #nStat span{display:block;margin:0}
+}

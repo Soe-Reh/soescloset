@@ -1,0 +1,53 @@
+/* A rod, not a rule: it carries the weight of everything below it. */
+#rail{position:absolute;z-index:5;left:0;right:0;top:0;height:3px;background:var(--ink);box-shadow:0 26px 12px rgba(11,11,11,.09);will-change:transform}
+#odo{position:absolute;z-index:3;left:0;right:0;bottom:18px;pointer-events:none;visibility:hidden}
+#odo div{display:flex;width:max-content;will-change:transform}
+#odo p{white-space:nowrap}
+#odo span{display:block}
+
+/* Seen from the front a hook is edge-on: a wire rising past the rod and closing over it. Drawn in the garment's canvas, so it swings with it. */
+.g>i{position:absolute;display:none;opacity:var(--wk)}
+.hung .g>i{display:block}
+.hk{left:797px;top:34px;width:6px;height:74px;border-radius:3px;background:var(--ink)}
+
+/* The tag ties to the rod beside the hood, in the clear air above the shoulder, so it labels its own piece and never lands on a print. */
+#tags{position:absolute;inset:0;z-index:6;pointer-events:none}
+.tag{--w:150px;position:absolute;left:0;top:0;width:var(--w);transform-origin:50% 0;will-change:transform;visibility:hidden}
+.tag::before{content:"";position:absolute;z-index:2;left:50%;top:0;width:1.5px;height:39px;margin-left:-.75px;background:var(--ink)}
+.tag::after,.tag>div{clip-path:polygon(20% 0,80% 0,100% 22px,100% 100%,0 100%,0 22px)}
+/* A hard cast shadow: one cheap layer that keeps the paper crisp while it swings. */
+.tag::after{content:"";position:absolute;left:4px;right:-4px;top:32px;bottom:-5px;background:#0b0b0b;opacity:.2}
+.tag>div{position:relative;z-index:1;margin-top:26px;padding:26px 12px 12px;background:var(--paper);color:var(--black);font-size:13px;line-height:15px;font-weight:500;font-stretch:75%;letter-spacing:.015em}
+.tag>div::before{content:"";position:absolute;left:50%;top:9px;width:9px;height:9px;margin-left:-4.5px;border-radius:50%;background:var(--ground)}
+.tag small{display:block;font-size:11px;font-weight:600;letter-spacing:.09em}
+.tag b{display:block;margin:3px 0 8px;font-size:62px;line-height:.92}
+.tag span{display:block;padding-top:7px;border-top:1px solid rgba(11,11,11,.85)}
+.tag em{display:block;font-style:normal;opacity:.62}
+/* Closed on the rack: the price alone, so a stack still reads along its tags. */
+.tag.tiny small,.tag.tiny span{display:none}
+.tag.tiny>div{padding-bottom:8px}
+.tag.tiny b{margin-bottom:0}
+/* A throw on a phone runs through several hangers instead of being stopped at each. */
+.mover[data-room=walk] .slot{scroll-snap-stop:normal}
+
+/* The rack in small hangs from its own hairline, and replaces the pager's progress line. On the room's ink, not on paper: ink is already chosen to read on each ground. */
+#rack{position:absolute;z-index:9;right:210px;bottom:18px;width:min(34cqw,442px);height:40px;display:flex;border-top:1px solid var(--ink);cursor:pointer;touch-action:none;visibility:hidden;user-select:none;-webkit-user-select:none}
+#rack img{flex:1 1 0;min-width:0;aspect-ratio:1;height:auto;align-self:flex-start;transform-origin:50% 0;transition:transform .25s var(--ease);-webkit-user-drag:none}
+#rack img:hover{transform:scale(1.35)}
+#rack img.on{transform:scale(1.7);position:relative;z-index:1}
+.pos[data-room=walk]{background:none;color:var(--ink);border-top:1px solid var(--ink)}
+.pos[data-room=walk] i{display:none}
+.pos[data-room=walk] small{position:absolute;right:0;bottom:100%;margin-bottom:6px;padding:0;white-space:nowrap}
+.pos[data-room=walk] b{min-width:44px;text-align:center}
+
+@media (max-width:760px){
+  #odo{bottom:106px}
+  #rack{left:16px;right:16px;width:auto;bottom:54px;height:44px}
+  .pos[data-room=walk]{bottom:12px;left:16px;right:16px;justify-content:space-between;border-top:0}
+  .pos[data-room=walk] small{display:block;position:static;margin:0;padding:0;font-size:12px}
+  .pos[data-room=walk].moved small{display:none}
+  .tag{--w:104px}
+  .tag>div{padding:24px 9px 10px;font-size:12px;line-height:14px}
+  .tag b{font-size:50px}
+  .tag em{display:none}
+}

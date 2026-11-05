@@ -1,0 +1,69 @@
+/* Wordmark as architecture. All layout lives in CSS so frame one is right before any script; hero.js reads the garment's place back off #ground::after. */
+/* --ox: hood centre, between the L's stem and the O's right edge, so the L cuts the hood and the O lands on the cloth. */
+.wm,#ground{--sy:1.18;--em:calc(98.5cqw/var(--wm));--top:calc((100cqh - .94*var(--em)*var(--sy))/2);--ox:calc(.75cqw + var(--em)*1.34);--c:min(118cqh,74cqw);--hood:calc((100cqh - .778*var(--c))/2)}
+.wm{position:absolute;left:0;top:0;display:flex;white-space:nowrap;color:var(--accent);transform-origin:0 0;line-height:.94;text-transform:uppercase;font-family:Six,Impact,sans-serif;font-weight:400;pointer-events:none;
+  font-size:var(--em);transform:translate(.75cqw,var(--top)) scaleY(var(--sy))}
+.wm span{display:inline-block;will-change:transform;clip-path:inset(-20% -6% 0 -6%)}
+/* The O of CLOSET is dyed into the garment by hero.js; the glyph only holds its place, or stands in when there is no shader. */
+.wm span:nth-child(7) i{visibility:hidden}
+.noO #wmF span:nth-child(7) i{visibility:visible}
+/* Starts part-risen, not hidden: the first frame must never be empty. Letters leave the O outward, and land almost together. */
+.wm i{display:inline-block;font-style:normal;animation:wm-rise .95s var(--ease) calc(max(var(--n) - 6,6 - var(--n))*22ms) backwards}
+@keyframes wm-rise{from{transform:translateY(58%)}}
+#wmB{z-index:2;visibility:hidden}#wmF{z-index:6}
+/* Every letter stands in front of the cloth and casts onto it. */
+#wmF i{text-shadow:.003em .004em .016em rgba(30,4,10,.42)}
+html[data-land]:not([data-land=""]) .wm{visibility:hidden}
+/* The slit: plaster-white from frame one, before the image can exist. Its box is the garment's hood-to-hem line. */
+#ground::after{content:"";position:absolute;left:var(--ox);top:var(--hood);width:1px;height:calc(var(--c)*.778);background:#efe9df;transform-origin:50% 50%;animation:slit .5s var(--ease) both}
+@keyframes slit{from{transform:scale(1,.4)}to{transform:scale(14,1)}}
+#ground.open::after{opacity:0;animation:none}
+html[data-land]:not([data-land=""]) #ground::after{opacity:0;animation:none}
+.g canvas.dye{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;visibility:inherit}
+/* A middle scale between the wordmark and the chrome. */
+#nHero{left:20px;bottom:16px;max-width:min(640px,44cqw);font-size:14px;line-height:19px}
+#nHero strong{display:block;margin-bottom:3px;font:400 44px/1.04 Six,Impact,sans-serif;text-transform:uppercase;letter-spacing:.012em;color:var(--accent)}
+#dyeKey,#heroCap{position:absolute;z-index:9;right:20px;bottom:18px;text-align:right;visibility:hidden;font-size:17px;line-height:22px;font-weight:500;color:var(--accent)}
+#dyeKey{padding:12px 10px 10px;margin:-10px;--p:0}
+/* The rule is the job: it fills with what has been dyed. */
+#dyeKey::before,#dyeKey::after{content:"";position:absolute;left:10px;right:10px;bottom:6px;height:2px;background:currentColor;opacity:.35}
+#dyeKey::after{opacity:1;transform:scaleX(var(--p));transform-origin:0 0;transition:transform .3s var(--ease)}
+#heroCap{font-size:15px;font-weight:400}
+/* The plain way in, beside the site's own metaphor. */
+#heroIn{position:absolute;z-index:9;right:10px;bottom:58px;padding:10px;font-size:17px;line-height:22px;font-weight:500;color:var(--accent);visibility:hidden}
+#heroIn::after{content:" \2192"}
+#heroIn:hover{text-decoration:underline;text-underline-offset:3px;text-decoration-thickness:1px}
+/* The rail's type waits until the letters are out of the way, then comes up from under the frame. */
+#stage.pre-walk :is(#odo,#cap){visibility:hidden!important}
+#stage:not(.pre-walk) #odo{animation:odo-in .8s var(--ease)}
+#stage:not(.pre-walk) #cap{animation:cap-in .6s linear}
+@keyframes odo-in{from{transform:translateY(40%);opacity:0}}
+@keyframes cap-in{from{opacity:0}}
+@container (max-aspect-ratio:13/18){
+  /* Phone: two full-width lines so the name reads upright. The piece sits whole on the second, its left cuff at the frame. */
+  .wm,#ground{--a:calc(97cqw/.875);--em:calc(97cqw/1.3125);--sy:.9;--top:48px;--line2:calc(var(--top) + var(--a)*.94*var(--sy));--ox:calc(1.5cqw + var(--em)*.49);--c:105cqw;--hood:calc(var(--line2) - .11*var(--c))}
+  .wm{flex-wrap:wrap;width:120cqw;font-size:var(--em);transform:translate(1.5cqw,var(--top)) scaleY(var(--sy))}
+  .wm span:nth-child(-n+4){font-size:var(--a)}
+  .wm span:nth-child(4){margin-right:20cqw}
+  #nHero{left:16px;right:16px;bottom:50px;max-width:none;font-size:13px;line-height:17px}
+  #nHero strong{font-size:34px}
+  #dyeKey,#heroCap{left:16px;right:auto;bottom:14px;text-align:left}
+  #dyeKey{margin:-10px}
+  #heroCap{right:16px}
+  #heroIn{right:6px;bottom:4px}
+}
+/* Short or wide stages: the caps give up height before they run off the frame. */
+/* 16:9 and wider also leave a clear line under the word for the note. */
+@container (min-aspect-ratio:5/3){.wm,#ground{--sy:1.02}}
+@container (min-aspect-ratio:9/5){.wm,#ground{--sy:.96}}
+@container (min-aspect-ratio:2/1){.wm,#ground{--sy:.82}}
+@container (min-aspect-ratio:5/2){.wm,#ground{--sy:.62}}
+/* A taller frame stretches the word, a shorter phone squeezes it, but the piece stays big enough for the O to land inside the hood. */
+@container (max-aspect-ratio:1/1) and (min-aspect-ratio:13/18){.wm,#ground{--sy:1.5}}
+@container (max-aspect-ratio:13/18) and (min-aspect-ratio:11/20){
+  .wm,#ground{--sy:.66}
+  #nHero{bottom:12px;right:auto}#nHero span{display:none}#nHero strong{margin:0}
+  #dyeKey,#heroCap{left:auto;right:16px;bottom:14px;text-align:right}
+}
+@container (max-aspect-ratio:13/18) and (min-aspect-ratio:13/20){.wm,#ground{--sy:.5;--c:100cqw}}
+@media (prefers-reduced-motion:reduce){.wm i{animation:none}#ground::after{opacity:0;animation:none}#stage:not(.pre-walk) :is(#odo,#cap){animation:none}}

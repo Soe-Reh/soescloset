@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>soescloset, Pullover Hoodies</title>
+<meta name="description" content="A visual comparison of 17 pullover hoodies from 12 labels, $160 to $1,500. Hang them on a rail, compare hoods, and split any two side by side.">
+<meta property="og:title" content="soescloset, Pullover Hoodies">
+<meta property="og:description" content="A visual comparison of 17 pullover hoodies from 12 labels, $160 to $1,500. Hang them on a rail, compare hoods, and split any two side by side.">
+<link rel="icon" href="data:,">
+<script>
+// Old anchors become routes before anything paints. data-land picks the first frame's colour in core.css.
+OLD={'#hero':'#/','#walk':'#/walk','#wall':'#/wall','#hood':'#/hood','#mean':'#/average','#average':'#/average','#compare':'#/price','#price':'#/price','#splice':'#/splice','#index':'#/index'};
+if(OLD[location.hash])history.replaceState(null,'',OLD[location.hash]);
+document.documentElement.dataset.land=location.hash.split('/')[1]||'';
+// One dropped script or stylesheet leaves a dead, empty stage: reload once rather than show it. Cleared on load, so one bad moment never stops a later retry.
+addEventListener('error',e=>{if(/^(SCRIPT|LINK)$/.test(e.target.tagName))try{if(!sessionStorage.soeRetry){sessionStorage.soeRetry=1;location.reload()}}catch{}},true);
+addEventListener('load',()=>{try{delete sessionStorage.soeRetry}catch{}});
+</script>
+<link rel="preload" href="fonts/six-caps-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/archivo-latin-wdth-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="data.json" as="fetch" crossorigin>
+<link rel="stylesheet" href="core.css">
+<link rel="stylesheet" href="parts/hero.css">
+<link rel="stylesheet" href="parts/walk.css">
+<link rel="stylesheet" href="parts/wall.css">
+<link rel="stylesheet" href="parts/hood.css">
+<link rel="stylesheet" href="parts/mean.css">
+<link rel="stylesheet" href="parts/compare.css">
+<link rel="stylesheet" href="parts/index.css">
+<link rel="stylesheet" href="parts/piece.css">
+</head>
+<body>
+<!-- Outside the stage so it spans every room, the index included. -->
+<div class="chrome" id="chrome"><a id="logo" href="#/">soescloset</a>
+  <button type="button" id="navBtn" aria-expanded="false" aria-controls="nav"><span id="navNow">Rooms</span></button>
+  <nav id="nav" aria-label="Rooms">
+    <a href="#/walk"><span>Walk</span></a>
+    <a href="#/wall"><span>Wall</span></a>
+    <a href="#/hood"><span>Hood</span></a>
+    <a href="#/average"><span>Average</span></a>
+    <a href="#/price"><span>Price</span></a>
+    <a href="#/splice"><span>Compare</span></a>
+    <a href="#/index"><span>Index</span></a>
+  </nav>
+  <i id="hair" aria-hidden="true"></i>
+</div>
+<main>
+  <!-- Shared stage. The first frame is plain HTML and CSS so it paints before any script runs. -->
+  <div id="stage" role="group" aria-label="Pullover hoodies">
+    <div id="ground"></div>
+    <div id="gs"></div>
+    <h1 class="wm" id="wmB" aria-label="soescloset"><span><i style="--n:0">s</i></span><span><i style="--n:1">o</i></span><span><i style="--n:2">e</i></span><span><i style="--n:3">s</i></span><span><i style="--n:4">c</i></span><span><i style="--n:5">l</i></span><span><i style="--n:6">o</i></span><span><i style="--n:7">s</i></span><span><i style="--n:8">e</i></span><span><i style="--n:9">t</i></span></h1>
+    <div class="wm" id="wmF" aria-hidden="true"><span><i style="--n:0">s</i></span><span><i style="--n:1">o</i></span><span><i style="--n:2">e</i></span><span><i style="--n:3">s</i></span><span class="f"><i style="--n:4">c</i></span><span class="f"><i style="--n:5">l</i></span><span><i style="--n:6">o</i></span><span><i style="--n:7">s</i></span><span><i style="--n:8">e</i></span><span><i style="--n:9">t</i></span></div>
+  </div>
+  <section id="hero" aria-label="Opening"></section>
+  <section id="walk" aria-label="Walk: one piece at a time on one rail" hidden></section>
+  <section id="wall" aria-label="Wall: a slit of every piece" hidden><input id="wallKey" type="range" min="0" step="1" value="0" aria-label="Open one piece on the wall. Enter shows its details, space lifts it out."><div id="wallSort" role="group" aria-label="Order the wall"></div></section>
+  <section id="hood" aria-label="Hood: every hood up close" hidden></section>
+  <section id="mean" aria-label="Average: all pieces averaged" hidden></section>
+  <section id="compare" aria-label="Compare: price, then two pieces spliced" hidden></section>
+  <section id="index" aria-label="Index of every piece" hidden></section>
+  <p class="sr" id="roomSay" role="status"></p>
+</main>
+<dialog id="pv" aria-labelledby="pvT"></dialog>
+<script type="module" src="core.js"></script>
+<script type="module" src="parts/hero.js"></script>
+<script type="module" src="parts/walk.js"></script>
+<script type="module" src="parts/wall.js"></script>
+<script type="module" src="parts/hood.js"></script>
+<script type="module" src="parts/mean.js"></script>
+<script type="module" src="parts/compare.js"></script>
+<script type="module" src="parts/index.js"></script>
+<script type="module" src="rooms.js"></script>
+</body>
+</html>

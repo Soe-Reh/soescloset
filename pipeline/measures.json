@@ -1,0 +1,1107 @@
+{
+ "ald-olive-tree": {
+  "hood_mouth_dark": 0.027,
+  "hood_crown_ratio": 0.403,
+  "fabric_l": 0.238,
+  "dominant_hex": "#191d33",
+  "source_hex": "#191d32",
+  "shoulder_width_ratio": 0.476,
+  "body_length_ratio": 0.717,
+  "hood_height_ratio": 0.238,
+  "sleeve_drop": 0.689,
+  "garment_height": 1302,
+  "fill_ratio": 0.327,
+  "hem_y": 1344,
+  "bottom_y": 1401,
+  "hood_top_width_ratio": 0.291,
+  "qa": {
+   "map": {
+    "ex_left": 432,
+    "ex_top": 154,
+    "leftPx": 325,
+    "topPx": 91
+   },
+   "lines": {
+    "top": 100,
+    "neck": 410,
+    "shoulder": 504,
+    "hem": 1344,
+    "cuff": 1401,
+    "l": 490,
+    "r": 1109
+   },
+   "bg": [
+    246,
+    246,
+    246
+   ],
+   "gains": [
+    1,
+    1,
+    1
+   ],
+   "scale": 0.665,
+   "capped": false,
+   "gC": 25,
+   "nw": 932,
+   "grade": {
+    "Lm": 0.236,
+    "Lt": 0.245,
+    "lowStd": 0.041,
+    "midStd": 0.029,
+    "fineStd": 0.02475,
+    "kLow": 0.735,
+    "gMid": 0.8,
+    "gFine": -0.35,
+    "kBand": 0.6,
+    "tiltX": 0.01,
+    "tiltY": 0,
+    "edge": 0.001,
+    "grain": 0,
+    "p2": 0.163,
+    "p98": 0.768,
+    "clip": 0
+   }
+  }
+ },
+ "parra-gator-pink": {
+  "hood_mouth_dark": 0.142,
+  "hood_crown_ratio": 0.502,
+  "fabric_l": 0.669,
+  "dominant_hex": "#d476ab",
+  "source_hex": "#d476ab",
+  "shoulder_width_ratio": 0.456,
+  "body_length_ratio": 0.763,
+  "hood_height_ratio": 0.224,
+  "sleeve_drop": 0.709,
+  "garment_height": 1260,
+  "fill_ratio": 0.311,
+  "hem_y": 1344,
+  "bottom_y": 1359,
+  "hood_top_width_ratio": 0.454,
+  "qa": {
+   "map": {
+    "ex_left": 435,
+    "ex_top": 177,
+    "leftPx": 359,
+    "topPx": 91
+   },
+   "lines": {
+    "top": 100,
+    "neck": 382,
+    "shoulder": 466,
+    "hem": 1344,
+    "cuff": 1359,
+    "l": 513,
+    "r": 1087
+   },
+   "bg": [
+    235,
+    235,
+    235
+   ],
+   "gains": [
+    1,
+    1,
+    1
+   ],
+   "scale": 0.783,
+   "capped": false,
+   "gC": 97,
+   "nw": 867,
+   "grade": {
+    "Lm": 0.661,
+    "Lt": 0.661,
+    "lowStd": 0.04,
+    "midStd": 0.027,
+    "fineStd": 0.01364,
+    "kLow": 0.744,
+    "gMid": 0.8,
+    "gFine": -0.047,
+    "kBand": 0.513,
+    "tiltX": 0.006,
+    "tiltY": -0.059,
+    "edge": 0.02,
+    "grain": 0,
+    "p2": 0.42,
+    "p98": 0.835,
+    "clip": 0
+   }
+  }
+ },
+ "vowels-collegiate-green": {
+  "hood_mouth_dark": 0.126,
+  "hood_crown_ratio": 0.495,
+  "fabric_l": 0.522,
+  "dominant_hex": "#2a7846",
+  "source_hex": "#297845",
+  "shoulder_width_ratio": 0.47,
+  "body_length_ratio": 0.727,
+  "hood_height_ratio": 0.221,
+  "sleeve_drop": 0.711,
+  "garment_height": 1313,
+  "fill_ratio": 0.342,
+  "hem_y": 1345,
+  "bottom_y": 1413,
+  "hood_top_width_ratio": 0.407,
+  "qa": {
+   "map": {
+    "ex_left": 397,
+    "ex_top": 173,
+    "leftPx": 308,
+    "topPx": 92
+   },
+   "lines": {
+    "top": 101,
+    "neck": 391,
+    "shoulder": 480,
+    "hem": 1345,
+    "cuff": 1413,
+    "l": 492,
+    "r": 1108
+   },
+   "bg": [
+    235,
+    235,
+    235
+   ],
+   "gains": [
+    1,
+    1,
+    1
+   ],
+   "scale": 0.809,
+   "capped": false,
+   "gC": 79,
+   "nw": 963,
+   "grade": {
+    "Lm": 0.517,
+    "Lt": 0.523,
+    "lowStd": 0.052,
+    "midStd": 0.03,
+    "fineStd": 0.01528,
+    "kLow": 0.6,
+    "gMid": 0.8,
+    "gFine": -0.149,
+    "kBand": 0.491,
+    "tiltX": 0.037,
+    "tiltY": -0.058,
+    "edge": 0.024,
+    "grain": 0,
+    "p2": 0.317,
+    "p98": 0.709,
+    "clip": 0
+   }
+  }
+ },
+ "loewe-cotton-blue": {
+  "hood_mouth_dark": 0.157,
+  "hood_crown_ratio": 0.51,
+  "fabric_l": 0.793,
+  "dominant_hex": "#a9c3ec",
+  "source_hex": "#a9c3ec",
+  "shoulder_width_ratio": 0.487,
+  "body_length_ratio": 0.734,
+  "hood_height_ratio": 0.228,
+  "sleeve_drop": 0.688,
+  "garment_height": 1294,
+  "fill_ratio": 0.329,
+  "hem_y": 1345,
+  "bottom_y": 1393,
+  "hood_top_width_ratio": 0.459,
+  "qa": {
+   "map": {
+    "ex_left": 417,
+    "ex_top": 178,
+    "leftPx": 340,
+    "topPx": 92
+   },
+   "lines": {
+    "top": 100,
+    "neck": 395,
+    "shoulder": 503,
+    "hem": 1345,
+    "cuff": 1393,
+    "l": 485,
+    "r": 1114
+   },
+   "bg": [
+    235,
+    235,
+    235
+   ],
+   "gains": [
+    1,
+    1,
+    1
+   ],
+   "scale": 0.803,
+   "capped": false,
+   "gC": 68,
+   "nw": 905,
+   "grade": {
+    "Lm": 0.789,
+    "Lt": 0.789,
+    "lowStd": 0.04,
+    "midStd": 0.028,
+    "fineStd": 0.01385,
+    "kLow": 0.759,
+    "gMid": 0.8,
+    "gFine": -0.061,
+    "kBand": 0.431,
+    "tiltX": 0.031,
+    "tiltY": -0.07,
+    "edge": 0.038,
+    "grain": 0,
+    "p2": 0.509,
+    "p98": 0.837,
+    "clip": 0.001
+   }
+  }
+ },
+ "rhude-desert": {
+  "hood_mouth_dark": 0.065,
+  "hood_crown_ratio": 0.509,
+  "fabric_l": 0.266,
+  "dominant_hex": "#24252a",
+  "source_hex": "#24242a",
+  "shoulder_width_ratio": 0.494,
+  "body_length_ratio": 0.694,
+  "hood_height_ratio": 0.25,
+  "sleeve_drop": 0.69,
+  "garment_height": 1318,
+  "fill_ratio": 0.352,
+  "hem_y": 1345,
+  "bottom_y": 1418,
+  "hood_top_width_ratio": 0.463,
+  "qa": {
+   "map": {
+    "ex_left": 381,
+    "ex_top": 180,
+    "leftPx": 289,
+    "topPx": 92
+   },
+   "lines": {
+    "top": 101,
+    "neck": 430,
+    "shoulder": 509,
+    "hem": 1345,
+    "cuff": 1418,
+    "l": 474,
+    "r": 1124
+   },
+   "bg": [
+    235,
+    235,
+    235
+   ],
+   "gains": [
+    1,
+    1,
+    1
+   ],
+   "scale": 0.821,
+   "capped": false,
+   "gC": 6,
+   "nw": 1003,
+   "grade": {
+    "Lm": 0.262,
+    "Lt": 0.276,
+    "lowStd": 0.054,
+    "midStd": 0.031,
+    "fineStd": 0.02392,
+    "kLow": 0.6,
+    "gMid": 0.8,
+    "gFine": -0.42,
+    "kBand": 0.6,
+    "tiltX": 0.003,
+    "tiltY": -0.014,
+    "edge": 0.001,
+    "grain": 0,
+    "p2": 0.181,
+    "p98": 0.674,
+    "clip": 0
+   }
+  }
+ },
+ "ald-marina-crown": {
+  "hood_mouth_dark": 0.062,
+  "hood_crown_ratio": 0.393,
+  "fabric_l": 0.413,
+  "dominant_hex": "#43466b",
+  "source_hex": "#44466c",
+  "shoulder_width_ratio": 0.474,
+  "body_length_ratio": 0.717,
+  "hood_height_ratio": 0.239,
+  "sleeve_drop": 0.69,
+  "garment_height": 1303,
+  "fill_ratio": 0.328,
+  "hem_y": 1345,
+  "bottom_y": 1402,
+  "hood_top_width_ratio": 0.288,
+  "qa": {
+   "map": {
+    "ex_left": 556,
+    "ex_top": 582,
+    "leftPx": 321,
+    "topPx": 92
+   },
+   "lines": {
+    "top": 100,
+    "neck": 411,
+    "shoulder": 503,
+    "hem": 1345,
+    "cuff": 1402,
+    "l": 492,
+    "r": 1108
+   },
+   "bg": [
+    246,
+    246,
+    246
+   ],
+   "gains": [
+    1,
+    1,
+    1
+   ],
+   "scale": 0.508,
+   "capped": false,
+   "gC": 40,
+   "nw": 943,
+   "grade": {
+    "Lm": 0.408,
+    "Lt": 0.414,
+    "lowStd": 0.017,
+    "midStd": 0.011,
+    "fineStd": 0.03974,
+    "kLow": 0.8,
+    "gMid": 1,
+    "gFine": -0.68,
+    "kBand": 0.097,
+    "tiltX": 0.015,
+    "tiltY": -0.026,
+    "edge": 0.025,
+    "grain": 0,
+    "p2": 0.317,
+    "p98": 0.466,
+    "clip": 0
+   }
+  }
+ },
+ "essentials-panel-seal": {
+  "hood_mouth_dark": 0.108,
+  "hood_crown_ratio": 0.482,
+  "fabric_l": 0.699,
+  "dominant_hex": "#bab498",
+  "source_hex": "#bbb497",
+  "shoulder_width_ratio": 0.538,
+  "body_length_ratio": 0.69,
+  "hood_height_ratio": 0.222,
+  "sleeve_drop": 0.693,
+  "garment_height": 1364,
+  "fill_ratio": 0.369,
+  "hem_y": 1345,
+  "bottom_y": 1464,
+  "hood_top_width_ratio": 0.391,
+  "qa": {
+   "map": {
+    "ex_left": 399,
+    "ex_top": 181,
+    "leftPx": 296,
+    "topPx": 92
+   },
+   "lines": {
+    "top": 101,
+    "neck": 404,
+    "shoulder": 518,
+    "hem": 1345,
+    "cuff": 1464,
+    "l": 434,
+    "r": 1167
+   },
+   "bg": [
+    235,
+    235,
+    235
+   ],
+   "gains": [
+    1,
+    1,
+    1
+   ],
+   "scale": 0.849,
+   "capped": false,
+   "gC": 33,
+   "nw": 994,
+   "grade": {
+    "Lm": 0.693,
+    "Lt": 0.712,
+    "lowStd": 0.055,
+    "midStd": 0.045,
+    "fineStd": 0.01803,
+    "kLow": 0.6,
+    "gMid": 0.8,
+    "gFine": -0.4,
+    "kBand": 0.45,
+    "tiltX": 0.021,
+    "tiltY": -0.061,
+    "edge": 0.055,
+    "grain": 0.0022,
+    "p2": 0.445,
+    "p98": 0.943,
+    "clip": 0
+   }
+  }
+ },
+ "casablanca-eveil-marle": {
+  "hood_mouth_dark": 0.132,
+  "hood_crown_ratio": 0.531,
+  "fabric_l": 0.873,
+  "dominant_hex": "#dad9d5",
+  "source_hex": "#d5dbe4",
+  "shoulder_width_ratio": 0.433,
+  "body_length_ratio": 0.736,
+  "hood_height_ratio": 0.212,
+  "sleeve_drop": 0.736,
+  "garment_height": 1313,
+  "fill_ratio": 0.317,
+  "hem_y": 1345,
+  "bottom_y": 1412,
+  "hood_top_width_ratio": 0.44,
+  "qa": {
+   "map": {
+    "ex_left": 459,
+    "ex_top": 173,
+    "leftPx": 367,
+    "topPx": 92
+   },
+   "lines": {
+    "top": 100,
+    "neck": 378,
+    "shoulder": 444,
+    "hem": 1345,
+    "cuff": 1411,
+    "l": 516,
+    "r": 1083
+   },
+   "bg": [
+    235,
+    235,
+    235
+   ],
+   "gains": [
+    1,
+    1,
+    1
+   ],
+   "scale": 0.809,
+   "capped": false,
+   "gC": 14,
+   "nw": 853,
+   "grade": {
+    "Lm": 0.867,
+    "Lt": 0.872,
+    "lowStd": 0.037,
+    "midStd": 0.029,
+    "fineStd": 0.01821,
+    "kLow": 0.821,
+    "gMid": 0.8,
+    "gFine": -0.286,
+    "kBand": 0.499,
+    "tiltX": 0.031,
+    "tiltY": -0.059,
+    "edge": 0.056,
+    "grain": 0,
+    "p2": 0.609,
+    "p98": 0.918,
+    "clip": 0
+   }
+  }
+ },
+ "vowels-blur-yellow": {
+  "hood_mouth_dark": 0,
+  "hood_crown_ratio": 0.516,
+  "fabric_l": 0.209,
+  "dominant_hex": "#191718",
+  "source_hex": "#181717",
+  "shoulder_width_ratio": 0.463,
+  "body_length_ratio": 0.7,
+  "hood_height_ratio": 0.218,
+  "sleeve_drop": 0.721,
+  "garment_height": 1355,
+  "fill_ratio": 0.351,
+  "hem_y": 1345,
+  "bottom_y": 1455,
+  "hood_top_width_ratio": 0.411,
+  "qa": {
+   "map": {
+    "ex_left": 401,
+    "ex_top": 172,
+    "leftPx": 303,
+    "topPx": 92
+   },
+   "lines": {
+    "top": 101,
+    "neck": 396,
+    "shoulder": 477,
+    "hem": 1345,
+    "cuff": 1455,
+    "l": 484,
+    "r": 1110
+   },
+   "bg": [
+    235,
+    235,
+    235
+   ],
+   "gains": [
+    1,
+    1,
+    1
+   ],
+   "scale": 0.834,
+   "capped": false,
+   "gC": 2,
+   "nw": 973,
+   "grade": {
+    "Lm": 0.207,
+    "Lt": 0.214,
+    "lowStd": 0.046,
+    "midStd": 0.029,
+    "fineStd": 0.00615,
+    "kLow": 0.652,
+    "gMid": 0.8,
+    "gFine": 0.35,
+    "kBand": 0.522,
+    "tiltX": 0.025,
+    "tiltY": -0.031,
+    "edge": 0.007,
+    "grain": 0.0073,
+    "p2": 0.145,
+    "p98": 0.638,
+    "clip": 0
+   }
+  }
+ },
+ "madhappy-cabernet": {
+  "hood_mouth_dark": 0.524,
+  "hood_crown_ratio": 0.419,
+  "fabric_l": 0.456,
+  "dominant_hex": "#893547",
+  "source_hex": "#893346",
+  "shoulder_width_ratio": 0.587,
+  "body_length_ratio": 0.719,
+  "hood_height_ratio": 0.264,
+  "sleeve_drop": 0.625,
+  "garment_height": 1265,
+  "fill_ratio": 0.375,
+  "hem_y": 1344,
+  "bottom_y": 1365,
+  "hood_top_width_ratio": 0.369,
+  "qa": {
+   "map": {
+    "ex_left": 224,
+    "ex_top": 354,
+    "leftPx": 239,
+    "topPx": 92
+   },
+   "lines": {
+    "top": 101,
+    "neck": 435,
+    "shoulder": 573,
+    "hem": 1344,
+    "cuff": 1364,
+    "l": 430,
+    "r": 1172
+   },
+   "bg": [
+    232,
+    231,
+    232
+   ],
+   "gains": [
+    0.997,
+    1.001,
+    0.997
+   ],
+   "scale": 0.697,
+   "capped": false,
+   "gC": 83,
+   "nw": 1108,
+   "grade": {
+    "Lm": 0.427,
+    "Lt": 0.458,
+    "lowStd": 0.023,
+    "midStd": 0.018,
+    "fineStd": 0.0141,
+    "kLow": 1.1,
+    "gMid": 1.066,
+    "gFine": -0.078,
+    "kBand": 0.09,
+    "tiltX": 0.012,
+    "tiltY": -0.057,
+    "edge": 0.029,
+    "grain": 0,
+    "p2": 0.189,
+    "p98": 0.521,
+    "clip": 0
+   }
+  }
+ },
+ "madhappy-lakers-grape": {
+  "hood_mouth_dark": 0.609,
+  "hood_crown_ratio": 0.437,
+  "fabric_l": 0.54,
+  "dominant_hex": "#835c95",
+  "source_hex": "#7a538c",
+  "shoulder_width_ratio": 0.58,
+  "body_length_ratio": 0.717,
+  "hood_height_ratio": 0.263,
+  "sleeve_drop": 0.63,
+  "garment_height": 1268,
+  "fill_ratio": 0.376,
+  "hem_y": 1343,
+  "bottom_y": 1367,
+  "hood_top_width_ratio": 0.364,
+  "qa": {
+   "map": {
+    "ex_left": 324,
+    "ex_top": 515,
+    "leftPx": 236,
+    "topPx": 92
+   },
+   "lines": {
+    "top": 100,
+    "neck": 434,
+    "shoulder": 567,
+    "hem": 1343,
+    "cuff": 1366,
+    "l": 432,
+    "r": 1166
+   },
+   "bg": [
+    235,
+    236,
+    239
+   ],
+   "gains": [
+    1.004,
+    1,
+    0.987
+   ],
+   "scale": 0.476,
+   "capped": false,
+   "gC": 59,
+   "nw": 1110,
+   "grade": {
+    "Lm": 0.51,
+    "Lt": 0.54,
+    "lowStd": 0.037,
+    "midStd": 0.027,
+    "fineStd": 0.02174,
+    "kLow": 0.818,
+    "gMid": 0.8,
+    "gFine": -0.35,
+    "kBand": 0.457,
+    "tiltX": 0.007,
+    "tiltY": -0.052,
+    "edge": 0.032,
+    "grain": 0,
+    "p2": 0.267,
+    "p98": 0.811,
+    "clip": 0
+   }
+  }
+ },
+ "essentials-yankees-pin": {
+  "hood_mouth_dark": 0.125,
+  "hood_crown_ratio": 0.483,
+  "fabric_l": 0.904,
+  "dominant_hex": "#e8e6d5",
+  "source_hex": "#e9e6d5",
+  "shoulder_width_ratio": 0.489,
+  "body_length_ratio": 0.741,
+  "hood_height_ratio": 0.224,
+  "sleeve_drop": 0.698,
+  "garment_height": 1289,
+  "fill_ratio": 0.326,
+  "hem_y": 1344,
+  "bottom_y": 1388,
+  "hood_top_width_ratio": 0.406,
+  "qa": {
+   "map": {
+    "ex_left": 422,
+    "ex_top": 180,
+    "leftPx": 338,
+    "topPx": 92
+   },
+   "lines": {
+    "top": 100,
+    "neck": 389,
+    "shoulder": 488,
+    "hem": 1344,
+    "cuff": 1388,
+    "l": 485,
+    "r": 1114
+   },
+   "bg": [
+    235,
+    235,
+    235
+   ],
+   "gains": [
+    1,
+    1,
+    1
+   ],
+   "scale": 0.801,
+   "capped": false,
+   "gC": 20,
+   "nw": 916,
+   "grade": {
+    "Lm": 0.889,
+    "Lt": 0.898,
+    "lowStd": 0.025,
+    "midStd": 0.017,
+    "fineStd": 0.02,
+    "kLow": 1.1,
+    "gMid": 0.55,
+    "gFine": -0.35,
+    "kBand": 0.536,
+    "tiltX": 0.047,
+    "tiltY": -0.066,
+    "edge": 0.039,
+    "grain": 0,
+    "p2": 0.441,
+    "p98": 0.94,
+    "clip": 0
+   }
+  }
+ },
+ "ksubi-snow-marle": {
+  "hood_mouth_dark": 0.079,
+  "hood_crown_ratio": 0.485,
+  "fabric_l": 0.892,
+  "dominant_hex": "#dbd9d5",
+  "source_hex": "#e3e3db",
+  "shoulder_width_ratio": 0.438,
+  "body_length_ratio": 0.713,
+  "hood_height_ratio": 0.206,
+  "sleeve_drop": 0.739,
+  "garment_height": 1354,
+  "fill_ratio": 0.351,
+  "hem_y": 1345,
+  "bottom_y": 1454,
+  "hood_top_width_ratio": 0.361,
+  "qa": {
+   "map": {
+    "ex_left": 400,
+    "ex_top": 178,
+    "leftPx": 298,
+    "topPx": 92
+   },
+   "lines": {
+    "top": 101,
+    "neck": 380,
+    "shoulder": 453,
+    "hem": 1345,
+    "cuff": 1453,
+    "l": 503,
+    "r": 1095
+   },
+   "bg": [
+    235,
+    235,
+    235
+   ],
+   "gains": [
+    1,
+    1,
+    1
+   ],
+   "scale": 0.841,
+   "capped": false,
+   "gC": 8,
+   "nw": 989,
+   "grade": {
+    "Lm": 0.901,
+    "Lt": 0.904,
+    "lowStd": 0.015,
+    "midStd": 0.02,
+    "fineStd": 0.0111,
+    "kLow": 1.1,
+    "gMid": 0.962,
+    "gFine": 0.171,
+    "kBand": 0.4,
+    "tiltX": 0.011,
+    "tiltY": -0.069,
+    "edge": 0.048,
+    "grain": 0,
+    "p2": 0.735,
+    "p98": 0.921,
+    "clip": 0
+   }
+  }
+ },
+ "ksubi-kaliba-deep": {
+  "hood_mouth_dark": 0.102,
+  "hood_crown_ratio": 0.503,
+  "fabric_l": 0.319,
+  "dominant_hex": "#222c35",
+  "source_hex": "#1a242b",
+  "shoulder_width_ratio": 0.466,
+  "body_length_ratio": 0.706,
+  "hood_height_ratio": 0.225,
+  "sleeve_drop": 0.7,
+  "garment_height": 1335,
+  "fill_ratio": 0.336,
+  "hem_y": 1345,
+  "bottom_y": 1435,
+  "hood_top_width_ratio": 0.438,
+  "qa": {
+   "map": {
+    "ex_left": 415,
+    "ex_top": 181,
+    "leftPx": 314,
+    "topPx": 92
+   },
+   "lines": {
+    "top": 101,
+    "neck": 402,
+    "shoulder": 500,
+    "hem": 1345,
+    "cuff": 1435,
+    "l": 489,
+    "r": 1110
+   },
+   "bg": [
+    235,
+    235,
+    235
+   ],
+   "gains": [
+    1,
+    1,
+    1
+   ],
+   "scale": 0.831,
+   "capped": false,
+   "gC": 20,
+   "nw": 956,
+   "grade": {
+    "Lm": 0.316,
+    "Lt": 0.316,
+    "lowStd": 0.043,
+    "midStd": 0.026,
+    "fineStd": 0.01679,
+    "kLow": 0.69,
+    "gMid": 0.8,
+    "gFine": -0.226,
+    "kBand": 0.359,
+    "tiltX": 0.023,
+    "tiltY": -0.047,
+    "edge": 0.019,
+    "grain": 0,
+    "p2": 0.183,
+    "p98": 0.452,
+    "clip": 0
+   }
+  }
+ },
+ "nahmias-powder-pink": {
+  "hood_mouth_dark": 0.035,
+  "hood_crown_ratio": 0.5,
+  "fabric_l": 0.921,
+  "dominant_hex": "#f4e6db",
+  "source_hex": "#f6e6dc",
+  "shoulder_width_ratio": 0.435,
+  "body_length_ratio": 0.663,
+  "hood_height_ratio": 0.22,
+  "sleeve_drop": 0.71,
+  "garment_height": 1409,
+  "fill_ratio": 0.357,
+  "hem_y": 1344,
+  "bottom_y": 1508,
+  "hood_top_width_ratio": 0.423,
+  "qa": {
+   "map": {
+    "ex_left": 388,
+    "ex_top": 182,
+    "leftPx": 263,
+    "topPx": 91
+   },
+   "lines": {
+    "top": 100,
+    "neck": 410,
+    "shoulder": 507,
+    "hem": 1344,
+    "cuff": 1508,
+    "l": 495,
+    "r": 1107
+   },
+   "bg": [
+    235,
+    235,
+    235
+   ],
+   "gains": [
+    1,
+    1,
+    1
+   ],
+   "scale": 0.879,
+   "capped": false,
+   "gC": 25,
+   "nw": 1054,
+   "grade": {
+    "Lm": 0.945,
+    "Lt": 0.927,
+    "lowStd": 0.013,
+    "midStd": 0.009,
+    "fineStd": 0.00318,
+    "kLow": 1.1,
+    "gMid": 1,
+    "gFine": 1.2,
+    "kBand": 0,
+    "tiltX": 0.01,
+    "tiltY": -0.059,
+    "edge": 0.039,
+    "grain": 0.003,
+    "p2": 0.832,
+    "p98": 0.943,
+    "clip": 0.001
+   }
+  }
+ },
+ "arcteryx-covert-jade": {
+  "hood_mouth_dark": 0.135,
+  "hood_crown_ratio": 0.53,
+  "fabric_l": 0.362,
+  "dominant_hex": "#2b4a45",
+  "source_hex": "#2b4945",
+  "shoulder_width_ratio": 0.471,
+  "body_length_ratio": 0.718,
+  "hood_height_ratio": 0.223,
+  "sleeve_drop": 0.698,
+  "garment_height": 1321,
+  "fill_ratio": 0.337,
+  "hem_y": 1345,
+  "bottom_y": 1421,
+  "hood_top_width_ratio": 0.455,
+  "qa": {
+   "map": {
+    "ex_left": 379,
+    "ex_top": 179,
+    "leftPx": 293,
+    "topPx": 92
+   },
+   "lines": {
+    "top": 101,
+    "neck": 396,
+    "shoulder": 498,
+    "hem": 1345,
+    "cuff": 1421,
+    "l": 489,
+    "r": 1110
+   },
+   "bg": [
+    235,
+    235,
+    235
+   ],
+   "gains": [
+    1,
+    1,
+    1
+   ],
+   "scale": 0.821,
+   "capped": false,
+   "gC": 27,
+   "nw": 999,
+   "grade": {
+    "Lm": 0.342,
+    "Lt": 0.359,
+    "lowStd": 0.049,
+    "midStd": 0.018,
+    "fineStd": 0.02807,
+    "kLow": 0.617,
+    "gMid": 1.058,
+    "gFine": -0.42,
+    "kBand": 0.2,
+    "tiltX": 0.031,
+    "tiltY": -0.057,
+    "edge": 0.03,
+    "grain": 0,
+    "p2": 0.217,
+    "p98": 0.465,
+    "clip": 0
+   }
+  }
+ },
+ "aton-urake-green": {
+  "hood_mouth_dark": 0.155,
+  "hood_crown_ratio": 0.482,
+  "fabric_l": 0.374,
+  "dominant_hex": "#274839",
+  "source_hex": "#284939",
+  "shoulder_width_ratio": 0.417,
+  "body_length_ratio": 0.702,
+  "hood_height_ratio": 0.26,
+  "sleeve_drop": 0.693,
+  "garment_height": 1294,
+  "fill_ratio": 0.291,
+  "hem_y": 1344,
+  "bottom_y": 1393,
+  "hood_top_width_ratio": 0.421,
+  "qa": {
+   "map": {
+    "ex_left": 487,
+    "ex_top": 181,
+    "leftPx": 389,
+    "topPx": 92
+   },
+   "lines": {
+    "top": 100,
+    "neck": 436,
+    "shoulder": 496,
+    "hem": 1344,
+    "cuff": 1393,
+    "l": 529,
+    "r": 1068
+   },
+   "bg": [
+    235,
+    235,
+    235
+   ],
+   "gains": [
+    1,
+    1,
+    1
+   ],
+   "scale": 0.805,
+   "capped": false,
+   "gC": 33,
+   "nw": 803,
+   "grade": {
+    "Lm": 0.37,
+    "Lt": 0.373,
+    "lowStd": 0.021,
+    "midStd": 0.017,
+    "fineStd": 0.01763,
+    "kLow": 1.1,
+    "gMid": 1.144,
+    "gFine": -0.262,
+    "kBand": 0.252,
+    "tiltX": 0.017,
+    "tiltY": -0.049,
+    "edge": 0.037,
+    "grain": 0,
+    "p2": 0.172,
+    "p98": 0.422,
+    "clip": 0
+   }
+  }
+ }
+}
