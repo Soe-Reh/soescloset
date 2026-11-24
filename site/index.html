@@ -3,14 +3,15 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>soescloset, Pullover Hoodies</title>
-<meta name="description" content="A visual comparison of 17 pullover hoodies from 12 labels, $160 to $1,500. Hang them on a rail, compare hoods, and split any two side by side.">
-<meta property="og:title" content="soescloset, Pullover Hoodies">
-<meta property="og:description" content="A visual comparison of 17 pullover hoodies from 12 labels, $160 to $1,500. Hang them on a rail, compare hoods, and split any two side by side.">
-<link rel="icon" href="data:,">
+<title>soescloset</title>
+<meta name="description" content="Compare clothes side by side.">
+<meta property="og:title" content="soescloset">
+<meta property="og:description" content="Compare clothes side by side.">
+<link rel="icon" href="img/logo/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="img/logo/apple-touch-icon.png">
 <script>
 // Old anchors become routes before anything paints. data-land picks the first frame's colour in core.css.
-OLD={'#hero':'#/','#walk':'#/walk','#wall':'#/wall','#hood':'#/hood','#mean':'#/average','#average':'#/average','#compare':'#/price','#price':'#/price','#splice':'#/splice','#index':'#/index'};
+OLD={'#hero':'#/','#walk':'#/walk','#wall':'#/wall','#hood':'#/hood','#mean':'#/average','#average':'#/average','#compare':'#/price','#price':'#/price','#splice':'#/splice','#index':'#/closet'};
 if(OLD[location.hash])history.replaceState(null,'',OLD[location.hash]);
 document.documentElement.dataset.land=location.hash.split('/')[1]||'';
 // One dropped script or stylesheet leaves a dead, empty stage: reload once rather than show it. Cleared on load, so one bad moment never stops a later retry.
@@ -25,6 +26,7 @@ addEventListener('load',()=>{try{delete sessionStorage.soeRetry}catch{}});
 <link rel="stylesheet" href="parts/walk.css">
 <link rel="stylesheet" href="parts/wall.css">
 <link rel="stylesheet" href="parts/hood.css">
+<link rel="stylesheet" href="parts/combo.css">
 <link rel="stylesheet" href="parts/mean.css">
 <link rel="stylesheet" href="parts/compare.css">
 <link rel="stylesheet" href="parts/index.css">
@@ -32,16 +34,16 @@ addEventListener('load',()=>{try{delete sessionStorage.soeRetry}catch{}});
 </head>
 <body>
 <!-- Outside the stage so it spans every room, the index included. -->
-<div class="chrome" id="chrome"><a id="logo" href="#/">soescloset</a>
-  <button type="button" id="navBtn" aria-expanded="false" aria-controls="nav"><span id="navNow">Rooms</span></button>
+<div class="chrome" id="chrome"><a id="logo" href="#/" aria-label="soescloset, home"><svg viewBox="7 7.5 106 61" aria-hidden="true" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="5"><g><path d="M52 18a8 8 0 1 1 8 8v6"/><path d="M60 32L10 66h100z"/></g></svg>soescloset</a>
+  <button type="button" id="navBtn" aria-expanded="false" aria-controls="nav"><span id="navNow">Menu</span></button>
   <nav id="nav" aria-label="Rooms">
+    <a href="#/closet"><span>Closet</span></a>
     <a href="#/walk"><span>Walk</span></a>
     <a href="#/wall"><span>Wall</span></a>
-    <a href="#/hood"><span>Hood</span></a>
-    <a href="#/average"><span>Average</span></a>
     <a href="#/price"><span>Price</span></a>
     <a href="#/splice"><span>Compare</span></a>
-    <a href="#/index"><span>Index</span></a>
+    <a href="#/hood"><span>Hood</span></a>
+    <a href="#/average"><span>Average</span></a>
   </nav>
   <i id="hair" aria-hidden="true"></i>
 </div>
@@ -59,7 +61,7 @@ addEventListener('load',()=>{try{delete sessionStorage.soeRetry}catch{}});
   <section id="hood" aria-label="Hood: every hood up close" hidden></section>
   <section id="mean" aria-label="Average: all pieces averaged" hidden></section>
   <section id="compare" aria-label="Compare: price, then two pieces spliced" hidden></section>
-  <section id="index" aria-label="Index of every piece" hidden></section>
+  <section id="index" aria-label="Closet: every piece on one field" hidden></section>
   <p class="sr" id="roomSay" role="status"></p>
 </main>
 <dialog id="pv" aria-labelledby="pvT"></dialog>
@@ -72,5 +74,6 @@ addEventListener('load',()=>{try{delete sessionStorage.soeRetry}catch{}});
 <script type="module" src="parts/compare.js"></script>
 <script type="module" src="parts/index.js"></script>
 <script type="module" src="rooms.js"></script>
+<script type="module" src="bg.js"></script>
 </body>
 </html>

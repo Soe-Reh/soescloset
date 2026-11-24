@@ -1,9 +1,9 @@
 @font-face{font-family:Six;src:url(fonts/six-caps-latin-400-normal.woff2) format("woff2");font-display:block}
 @font-face{font-family:Arc;src:url(fonts/archivo-latin-wdth-normal.woff2) format("woff2");font-weight:100 900;font-stretch:62% 125%;font-display:swap}
 /* --wm: width of SOESCLOSET per 1px of Six Caps, so the wordmark fits in pure CSS on the first frame. */
-:root{--paper:#f6f6f4;--black:#0b0b0b;--ground:#5c2430;--ink:#f6f1e6;--accent:#ebe3b8;--ease:cubic-bezier(.16,1,.3,1);--wm:2.1875}
+:root{--paper:#f6f6f4;--black:#0b0b0b;--ground:#e1e1df;--ink:#111111;--accent:#111111;--ease:cubic-bezier(.16,1,.3,1);--wm:2.1875}
 /* A deep link's first frame is the paper its beat ends on, not the opening's colour. */
-html[data-land]:not([data-land=""],[data-land=walk]){--ground:var(--paper);--ink:var(--black)}
+html[data-land]{--ground:#e1e1df;--ink:#111111}
 *{box-sizing:border-box;margin:0;padding:0}
 /* No room scrolls the page; only the index does, and it sets .ix. */
 html{background:var(--ground);-webkit-text-size-adjust:100%;height:100%;overflow:hidden}
@@ -12,6 +12,11 @@ body{font:400 13px/17px Arc,"Helvetica Neue",Arial,sans-serif;letter-spacing:.00
 a{color:inherit;text-decoration:none}
 button{all:unset;cursor:pointer}
 :focus-visible{outline:2px solid currentColor;outline-offset:2px}
+/* The one button style: a filled pill, 44px tall. Start, Suggest and the switches share it. */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:44px;padding:0 20px;border-radius:999px;background:#111;color:#e1e1df;font-size:14px;line-height:1;font-weight:600;font-stretch:88%;white-space:nowrap;transition:background-color .2s}
+.btn:hover{background:#2e2e2d}
+.btn svg{width:16px;height:10px;flex:none;fill:none;stroke:currentColor;stroke-width:1.4}
+.btn:focus-visible{outline:2px solid #111;outline-offset:2px}
 .six{font-family:Six,Impact,sans-serif;font-weight:400;letter-spacing:0;line-height:.9;text-transform:uppercase}
 
 main>section:not(#index){position:absolute;width:0;height:0}
@@ -20,12 +25,22 @@ main>section:not(#index){position:absolute;width:0;height:0}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
 #ground{position:absolute;inset:0;background:var(--ground)}
 #gs{position:absolute;inset:0;z-index:4}
-.g{position:absolute;left:0;top:0;width:1600px;height:1600px;transform-origin:0 0;will-change:transform;visibility:hidden}
+/* The contour background (bg.js): on the ground in the stage, under everything in the Closet. */
+#topo{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;display:block}
+#topo svg{width:100%;height:100%}
+#index>#topo{z-index:-1}
+.g{position:absolute;left:0;top:0;width:1600px;height:1600px;transform-origin:0 0;visibility:hidden} /* no will-change: a hint pins each 1600px box at its biggest raster; translate3d alone keeps a layer at its shown size */
 .g img{position:absolute;inset:0;width:100%;height:100%;display:block;user-select:none;-webkit-user-drag:none;pointer-events:none}
 
 .big{position:absolute;pointer-events:none;white-space:nowrap;visibility:hidden}
 .chrome{position:absolute;z-index:9;left:20px;right:20px;top:14px;display:flex;justify-content:space-between;align-items:baseline}
 #logo{font:400 36px/1 Six,Impact,sans-serif;letter-spacing:.03em;text-transform:uppercase}
+/* The hanger mark stands on the wordmark's baseline, as tall as its capitals. */
+#logo svg{height:.86em;width:auto;margin-right:.2em;vertical-align:0;overflow:visible}
+/* Hover: the mark swings once from its hook and settles (damped). */
+#logo svg g{transform-box:view-box;transform-origin:60px 10px}
+#logo:hover svg g{animation:swing 1.1s cubic-bezier(.3,0,.4,1)}
+@keyframes swing{0%{rotate:0deg}18%{rotate:9deg}40%{rotate:-5.5deg}60%{rotate:3deg}80%{rotate:-1.2deg}100%{rotate:0deg}}
 nav{display:flex;gap:16px}
 #navBtn{display:none}
 nav a{padding:2px 0;border-bottom:1px solid transparent;font-size:13px;font-weight:600;font-stretch:75%;letter-spacing:.07em;text-transform:uppercase}
@@ -59,16 +74,35 @@ nav a{padding:2px 0;border-bottom:1px solid transparent;font-size:13px;font-weig
 .pos button[disabled]{opacity:.25;cursor:default}
 .pos b{font-weight:600;padding:0 2px}
 .pos svg{width:16px;height:10px;fill:none;stroke:currentColor;stroke-width:1.2}
+/* A room with nothing to count (Compare) keeps only its two doors, split by a short rule. */
+/* The armed note: one push past the end shows it, a second turns the page. */
+.pos .again{position:absolute;right:0;bottom:100%;margin-bottom:8px;padding:5px 10px;background:var(--black);color:var(--paper);font-weight:600;letter-spacing:.07em;opacity:0;translate:0 4px;transition:opacity .2s,translate .2s var(--ease);pointer-events:none}
+.pos.armed .again{opacity:1;translate:0 0}
+.pos.links i{width:1px;height:14px;margin:0 2px;background:rgba(11,11,11,.3)}.pos.links i::after{display:none}
 #hair{position:absolute;left:0;top:0;width:1px;height:2px;background:currentColor;transform-origin:0 0;transform:scaleX(0);pointer-events:none;transition:transform .55s var(--ease)}
-.stage-in{animation:slit-in .55s var(--ease) both}
-@keyframes slit-in{from{clip-path:inset(0 50%)}to{clip-path:inset(0 0)}}
-/* A room opens from a slit over the one it replaces; only the garment both rooms share flies between them. */
-::view-transition-old(root){animation:none;opacity:1}
-::view-transition-new(root){animation:slit-in .62s var(--ease) both}
-::view-transition-group(carry){animation-duration:.62s;animation-timing-function:var(--ease);z-index:2}
+/* Round 4 page turn, one experience for everyone (Reduce Motion on or off), motion-safe: no 3D, no big scale.
+   The new room slides up whole a short way and fades in; the old one fades and drifts up slightly (scale .97 at the least). No clip ever cuts a room. */
+.stage-in{animation:turn-in .6s var(--ease) both} /* browsers without view transitions */
+::view-transition-old(root){animation:turn-out .45s cubic-bezier(.4,0,.2,1) both;transform-origin:50% 0}
+::view-transition-new(root){animation:turn-in .6s var(--ease) .08s both}
+@keyframes turn-out{to{transform:translateY(-3%) scale(.97);opacity:0}}
+@keyframes turn-in{from{transform:translateY(8%);opacity:0}}
+/* Going back (to an earlier room) runs the other way. Set by rooms.js. */
+html[data-turn=back]::view-transition-old(root){animation-name:turn-out-back;transform-origin:50% 100%}
+html[data-turn=back]::view-transition-new(root){animation-name:turn-in-back}
+@keyframes turn-out-back{to{transform:translateY(3%) scale(.97);opacity:0}}
+@keyframes turn-in-back{from{transform:translateY(-8%);opacity:0}}
+/* Home to Closet options 1 and 2 (rooms.js ?tr=): the rooms only cross-fade; the pieces themselves travel (hero.js). */
+/* The top bar is the same in every room, so it stays put while the rooms change under it. */
+/* Behind both rooms while they cross: the studio grey. */
+::view-transition{background:#e1e1df}
+#chrome{view-transition-name:chrome}
+::view-transition-group(chrome){animation-duration:.35s}
+@keyframes fade-out{to{opacity:0}}@keyframes fade-in{from{opacity:0}}
 
 @media (max-width:760px){
-  #logo{font-size:30px;position:relative;z-index:1}
+  /* Padding cancelled by margin: a 44px thumb target with no change to the bar. */
+  #logo{font-size:30px;position:relative;z-index:1;padding-block:7px;margin-block:-7px}
   /* Seven words never fit beside the name: the phone gets the room's own name, and all of them as a poster when asked. */
   #navBtn{display:flex;position:relative;z-index:1;align-items:center;gap:8px;min-height:44px;margin:-12px 0;font-size:13px;font-weight:600;font-stretch:75%;letter-spacing:.07em;text-transform:uppercase;pointer-events:auto}
   #navBtn::after{content:"";width:11px;height:7px;border-block:1px solid currentColor}
@@ -79,6 +113,8 @@ nav a{padding:2px 0;border-bottom:1px solid transparent;font-size:13px;font-weig
   #chrome:has(nav.open){mix-blend-mode:normal;pointer-events:auto}
   #chrome:has(nav.open) #logo,#chrome:has(nav.open) #navBtn{color:var(--black)!important}
   #hair{display:none}
-  .pos{left:16px;right:16px;bottom:12px}.pos i{flex:1;width:auto}.pos small{display:none}
+  .pos{left:16px;right:16px;bottom:12px;height:44px}.pos button{height:44px}.pos i{flex:1;width:auto}.pos small{display:none}
 }
-@media (prefers-reduced-motion:reduce){#hair{transition:none}.stage-in{animation:none}}
+
+/* Round 4: a garment picture still decoding shows a soft blob of its own dominant color in the garment's place, never a blank or half-drawn image (core.js whole()). */
+img.wait{object-position:-99999px 0;background:radial-gradient(29% 36% at 50% 47%,color-mix(in srgb,var(--dc) 55%,transparent) 78%,transparent)}

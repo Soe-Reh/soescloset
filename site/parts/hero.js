@@ -1,20 +1,22 @@
 import {S,$,G,CT,HH,BLACK,clamp,lerp,sss,mix,vis,money,add,hex,css,lum} from '../core.js';
-const {q,N,reduced,deep}=S,g0=G[0],prices=G.map(g=>g.price);
+const {q,N,deep}=S,g0=G[0],prices=G.map(g=>g.price);
 const stage=$('stage'),ground=$('ground');
-document.title='soescloset, Pullover Hoodies';
-const note=add(`<p class="note" id="nHero"><strong>Pullover Hoodies</strong><span>${N} pullover hoodies from ${new Set(G.map(g=>g.brand)).size} labels, ${money(Math.min(...prices))} to ${money(Math.max(...prices))}.</span></p>`);
-const enterIn=add(`<a id="heroIn" href="#/walk">See all ${N}</a>`);
-const key=add(`<button id="dyeKey" type="button">Drag across the plaster</button>`);
-const cap=add(`<p id="heroCap">${g0?`${g0.brand} ${g0.short}${g0.col?', '+g0.col[0].toUpperCase()+g0.col.slice(1):''}, ${money(g0.price)}`:''}</p>`);
+document.title='soescloset';
+const note=add(`<p class="note" id="nHero"><strong>Compare clothes side by side.</strong><span>${N} hoodies from ${new Set(G.map(g=>g.brand)).size} labels, ${money(Math.min(...prices))} to ${money(Math.max(...prices))}.</span></p>`);
+const enterIn=add(`<a id="heroIn" class="btn" href="#/closet">Start<svg viewBox="0 0 16 10" aria-hidden="true"><path d="M0 5h15M11 1l4 4-4 4"/></svg></a>`);
+// The way on for anyone who does not see Start: it pulses, and nudges once if nothing has happened for a while.
+const cue=add(`<a id="heroCue" href="#/closet" aria-label="Scroll to the next room, the Closet">Scroll<i></i></a>`);
+const key=add(`<button id="dyeKey" type="button">Drag to paint it in</button>`);
+const cap=add(`<p id="heroCap">${g0?`${g0.brand}<span class="long"> ${g0.short}${g0.col?', '+g0.col[0].toUpperCase()+g0.col.slice(1):''}</span>, ${money(g0.price)}`:''}</p>`);
 const wms=[$('wmB'),$('wmF')],spans=wms.flatMap(w=>[...w.children]);
 // If the opener is gone and its stand-in has a pale room, butter letters would vanish on it.
 if(g0&&g0.ink===BLACK)[...wms,note].forEach(el=>el.style.setProperty('--accent',css(BLACK)));
-let boot=reduced||deep?1:0,start=0,wmDone=false,hx=0,hy=0,hc=0,sy=1;
+let boot=deep?1:0,start=0,wmDone=false,hx=0,hy=0,hc=0,sy=1;
 
 // ---- plaster and dye. One shader draws the garment while it is being painted; the real <img> takes over when it closes.
 const FS=`#version 300 es
 precision highp float;
-uniform sampler2D T,M,O;uniform float close,L0,oRev,stain;uniform vec3 room;in vec2 v;out vec4 o;
+uniform sampler2D T,M,O;uniform float close,L0,oRev,stain,K;uniform vec3 room;in vec2 v;out vec4 o;
 float h(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
 float n(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);return mix(mix(h(i),h(i+vec2(1,0)),f.x),mix(h(i+vec2(0,1)),h(i+vec2(1,1)),f.x),f.y);}
 float y(vec3 c){return dot(c,vec3(.299,.587,.114));}
@@ -25,7 +27,7 @@ void main(){
   // Plaster is a cast: keep the folds, lose most of the knit. Light is normalised to this cloth, so a dark piece casts as white as a pale one.
   float ls=y(s.rgb/max(s.a,.01)),k=max(L0,.14),l=mix(ls,y(c),.55),sh=clamp(.78+(l-L0)/k*1.05,0.,1.);
   sh=mix(sh,sh*sh*(3.-2.*sh),.5);
-  vec3 pl=mix(mix(room,vec3(.6,.57,.55),.6),vec3(.97,.955,.925),sh)+(h(gl_FragCoord.xy)-.5)*.018+(n(gl_FragCoord.xy*.3)-.5)*.012;
+  vec3 pl=mix(mix(room,vec3(.6,.57,.55),.6),vec3(.97,.955,.925),sh)+(h(gl_FragCoord.xy*K)-.5)*.018+(n(gl_FragCoord.xy*K*.3)-.5)*.012;
   // Dye runs into valleys and seams first and feathers along the cloth. With no paint nearby the sum can never reach the front.
   // The mask is warped so no stroke keeps the round shape of the brush.
   vec2 wv=v+(vec2(n(v*13.),n(v*13.+9.))-.5)*.04;
@@ -64,7 +66,7 @@ function initGL(){
   const pr=gl.createProgram();gl.attachShader(pr,sh(gl.VERTEX_SHADER,VS));gl.attachShader(pr,sh(gl.FRAGMENT_SHADER,FS));gl.linkProgram(pr);gl.useProgram(pr);
   gl.bindBuffer(gl.ARRAY_BUFFER,gl.createBuffer());gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,3,-1,-1,3]),gl.STATIC_DRAW);
   gl.enableVertexAttribArray(0);gl.vertexAttribPointer(0,2,gl.FLOAT,false,0,0);
-  for(const n of ['T','M','O','close','L0','oRev','stain','room'])U[n]=gl.getUniformLocation(pr,n);
+  for(const n of ['T','M','O','close','L0','oRev','stain','room','K'])U[n]=gl.getUniformLocation(pr,n);
   gl.uniform1i(U.T,0);gl.uniform1i(U.M,1);gl.uniform1i(U.O,2);
   const d=hex(g0.dominant_hex).map(v=>v/255);gl.uniform1f(U.L0,d[0]*.299+d[1]*.587+d[2]*.114);gl.uniform3fv(U.room,g0.room.map(v=>v/255));
   gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL,true);
@@ -106,7 +108,10 @@ function upload(img){
   gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,img);gl.generateMipmap(gl.TEXTURE_2D);
   gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR_MIPMAP_LINEAR);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);
 }
-function sizeGL(){if(!glc)return;const r=Math.round(Math.min(1600,hc*S.dpr));if(glc.width!==r){glc.width=glc.height=r;gl.viewport(0,0,r,r);dirty=true}}
+// While the dye moves the shader draws at 1 CSS px per pixel (2.5x fewer pixels on a 2x screen); once still for 200 ms it draws once at full size, so the cloth at rest is unchanged.
+let fullR=0,lowR=0,curR=0,lastDraw=0;
+function setR(r){if(curR===r)return;curR=glc.width=glc.height=r;gl.viewport(0,0,r,r);gl.uniform1f(U.K,fullR/r)}
+function sizeGL(){if(!glc)return;fullR=Math.round(Math.min(1600,hc*S.dpr));lowR=Math.round(Math.min(fullR,hc));setR(fullR);dirty=true}
 function finish(){paint=false;close=1;stage.classList.add('noO');if(glc){g0.ct.style.opacity='';glc.remove();glc=null;gl=null}}
 
 const stamp=(u,v,r,a)=>{const R=r*MS*2;mctx.globalAlpha=a;mctx.drawImage(brush,u*MS-R/2,v*MS-R/2,R,R);dirty=true};
@@ -127,6 +132,7 @@ function pointer(x,y){
   const s=stage.getBoundingClientRect(),P=S.live[0];if(!P)return;
   const u=(x-s.left-(P.x-P.c/2))/P.c,v=(y-s.top-(P.y-P.c*CT))/P.c;
   if(u<0||u>1||v<0||v>1){last=null;return}
+  if(auto){auto=false;last=null}
   idleAt=S.now+2600;stroke(u,v,S.now);
   key.style.setProperty('--p',clamp(cells.size/41));
   if(!closeRate&&cells.size>41)closeRate=1/2600;
@@ -139,7 +145,51 @@ stage.addEventListener('touchmove',e=>pointer(e.touches[0].clientX,e.touches[0].
 stage.addEventListener('touchend',()=>last=null,{passive:true});
 key.addEventListener('click',()=>{if(paint&&!closeRate)closeRate=1/2200});
 
+// ---- never stuck: one scroll, swipe, arrow key or Space on Home goes on to the Closet (round 3: the main room).
+const home=()=>S.room==='cover'&&!document.getElementById('pv')?.open;
+let gone=0,lockTo=0,lastWheel=0,nudge=0,ty=null;
+const go=()=>{if(!home()||performance.now()-gone<1500)return;gone=performance.now();S.hush?.(1200);location.hash='#/closet'};
+const poke=()=>{clearTimeout(nudge);if(!cue.classList.contains('nudged'))nudge=setTimeout(()=>{if(home()){cue.classList.add('nudged')}},6000)};
+poke();
+// A trackpad flick keeps sending deltas for a second; they belong to this turn, not to the Walk rail. Loaded before rooms.js, so this listener runs first.
+addEventListener('wheel',e=>{
+  const t=performance.now();
+  if(t<lockTo){if(t-lastWheel<220){lastWheel=t;lockTo=t+400;e.preventDefault();e.stopImmediatePropagation()}return}
+  if(!home()||e.ctrlKey)return;
+  lastWheel=t;poke();
+  if(Math.abs(e.deltaY)+Math.abs(e.deltaX)<4)return;
+  e.preventDefault();lockTo=t+1200;go();
+},{passive:false});
+addEventListener('keydown',e=>{
+  poke();
+  if(!home()||e.altKey||e.ctrlKey||e.metaKey||e.target.matches?.('input,select,textarea'))return;
+  const k=e.key,on=!e.target.matches?.('button');
+  if(k==='ArrowDown'||k==='ArrowRight'||k==='PageDown'||(k===' '&&on)){e.preventDefault();go()}
+});
+addEventListener('touchstart',e=>{poke();ty=home()?[e.touches[0].clientX,e.touches[0].clientY]:null},{passive:true});
+addEventListener('touchend',e=>{
+  if(!ty)return;const t=e.changedTouches[0],dx=t.clientX-ty[0],dy=t.clientY-ty[1];ty=null;
+  if(dy<-40&&Math.abs(dy)>Math.abs(dx)*1.2)go();
+},{passive:true});
+addEventListener('pointermove',poke,{passive:true});
+
+// ---- the paint plays by itself. A hand on the cloth takes over the brush.
+// The wordmark rise, the slit opening and the paint-in play the same for everyone (Reduce Motion on or off): slides, fades and a slow colour flood.
+let auto=true,autoT=0;
+const AUTO=2600,PASS=6;
+// A serpentine down the cloth, so the dye arrives the way a hand would bring it.
+const autoAt=t=>{const k=t*PASS,p=Math.min(PASS-1,k|0),f=k-p,u=p%2?lerp(.78,.22,f):lerp(.22,.78,f);return [u+Math.sin(t*31)*.02,lerp(.1,.84,(p+f*.6)/PASS)]};
+function autoPaint(now){
+  if(!auto||!start)return;
+  const t=(now-start-500)/AUTO;if(t<0)return;
+  if(t>=1){auto=false;last=null;if(!closeRate)closeRate=1/2600;return}
+  if(!autoT){autoT=1;last=null}
+  const [u,v]=autoAt(t);stroke(u,v,now,.25);key.style.setProperty('--p',clamp(t));
+}
+
+
 function tick(now){
+  autoPaint(now);
   while(stamps.length&&stamps[0][0]<=now){const s=stamps.shift();stamp(s[1],s[2],s[3],s[4])}
   if(idleAt&&now>idleAt&&!closeRate)closeRate=1/3400;
   if(closeRate)close=Math.min(1,close+S.dt*closeRate);
@@ -148,11 +198,11 @@ function tick(now){
   if(away)close=1;
   if(away!==hidden){hidden=away;glc.style.visibility=away?'hidden':'';g0.ct.style.opacity=away?'':0;if(!away)dirty=true}
   if(away)return;
-  const eff=Math.max(close,clamp(q.hero*5)),oR=reduced?1:clamp((now-start-380)/1100),sta=close*(1-clamp(q.hero*7));
+  const eff=Math.max(close,clamp(q.hero*5)),oR=clamp((now-start-380)/1100),sta=close*(1-clamp(q.hero*7));
   if(eff!==U._c||oR!==U._r||sta!==U._s){U._c=eff;U._r=oR;U._s=sta;gl.uniform1f(U.close,sss(eff));gl.uniform1f(U.oRev,oR);gl.uniform1f(U.stain,sta);dirty=true}
   if(fullImg&&!fullUp){fullUp=true;upload(fullImg);dirty=true}
-  if(!dirty)return;
-  dirty=false;
+  if(!dirty){if(curR!==fullR&&now-lastDraw>200){setR(fullR);gl.drawArrays(gl.TRIANGLES,0,3)}return}
+  dirty=false;setR(lowR);lastDraw=now;
   gl.activeTexture(gl.TEXTURE1);gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL,false);gl.texSubImage2D(gl.TEXTURE_2D,0,0,0,gl.RGBA,gl.UNSIGNED_BYTE,mctx.canvas);gl.generateMipmap(gl.TEXTURE_2D);
   gl.drawArrays(gl.TRIANGLES,0,3);
 }
@@ -167,7 +217,7 @@ if(!deep&&g0){
     measure();
     start=performance.now();
     try{if(!initGL())finish()}catch(e){console.error(e);finish()}
-    const im=new Image();im.src=g0.image;im.decode().then(()=>fullImg=im,()=>{});
+    S.smallIn.then(()=>{const im=new Image();im.src=g0.image;return im.decode().then(()=>fullImg=im)}).catch(()=>{}); // full size only once every small picture is in
   });
 }
 
@@ -183,7 +233,7 @@ function measure(){
 S.part('hero',{segs:[['hero',.9]],
   rooms:{cover:{at:()=>0,now:()=>0,pick:()=>S.hit()}},
   measure,
-  pre(){if(start&&boot<1)boot=clamp((S.now-start)/720);if(start)ground.classList.add('open');if(paint)tick(S.now);stage.classList.toggle('pre-walk',q.hero<.5)},
+  pre(){S.dyeing=paint&&S.room==='cover';if(start&&boot<1)boot=clamp((S.now-start)/720);if(start)ground.classList.add('open');if(paint)tick(S.now);stage.classList.toggle('pre-walk',q.hero<.5)},
   pose(i,P){
     if(q.hero<1)P=mix(heroPose(i),P,sss(q.hero));
     // The opening: fast out of the slit, so the very first frames already read as a door opening on the whole piece.
@@ -195,6 +245,6 @@ S.part('hero',{segs:[['hero',.9]],
     if(q.hero<1||!wmDone){spans.forEach((sp,n)=>{const t=sss(clamp(q.hero*2.4-Math.abs(n%10-6)*.07));sp.style.transform=`translate3d(0,${(-t*S.h*1.2/sy).toFixed(1)}px,0)`});wmDone=q.hero>=1}
     wms.forEach(el=>vis(el,q.hero<.7?1:0));
     const n=clamp((boot-.65)*3)*(1-clamp(q.hero*25));
-    vis(note,n);vis(enterIn,n);vis(key,paint&&!closeRate?n:0);vis(cap,paint&&!closeRate?0:n);
+    vis(note,n);vis(enterIn,n);vis(cue,n);vis(key,paint&&!closeRate?n:0);vis(cap,paint&&!closeRate?0:n);
   },
 });

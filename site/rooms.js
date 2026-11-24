@@ -1,32 +1,35 @@
 // Routes, room changes and the shared hoodie click. Loaded last, so every part has already said what its rooms are.
-import {S,G,CT,lerp} from './core.js';
+import {S,G,CT} from './core.js';
+import {wheelPx} from './motion.js';
 import {mover} from './mover.js';
 import {show,hide,isOpen} from './parts/piece.js';
 
-const ORDER=[['cover','hero','Pullover Hoodies'],['walk','walk','Walk'],['wall','wall','Wall'],['hood','hood','Hood'],['average','mean','Average'],['price','compare','Price'],['splice','compare','Compare'],['index','index','Index']];
-const hashOf=n=>n==='cover'?'#/':'#/'+n,root=document.documentElement,stage=document.getElementById('stage'),say=document.getElementById('roomSay');
+// Round 3: the Closet (the room still named 'index' inside, its section #index) is the main room, right after Home. #/index stays as an alias.
+const ORDER=[['cover','hero','Home'],['index','index','Closet'],['walk','walk','Walk'],['wall','wall','Wall'],['price','compare','Price'],['splice','compare','Compare'],['hood','hood','Hood'],['average','mean','Average']];
+const hashOf=n=>n==='cover'?'#/':n==='index'?'#/closet':'#/'+n,root=document.documentElement,stage=document.getElementById('stage'),say=document.getElementById('roomSay');
 const secs=[...document.querySelectorAll('main>section')],navs=[...document.querySelectorAll('#nav a')],hair=document.getElementById('hair');
-const FILM_MAX=4; // screens: further than this a film is a blur of unrelated pieces, so the room cuts instead
 const movers={},tails={},idOf=id=>G.findIndex(g=>g.id===id);
 history.scrollRestoration='manual'; // the index restores its own place; the browser would restore it before we can read it
-let film=0,ixY=0,fromRoom=false,origin=null,lastEl=null;
+let ixY=0,fromRoom=false,origin=null,lastEl=null;
 
+// A room's neighbours as [hash, label]: the last room hands on to the Closet, the hub; the first rail room backs into it.
+S.nbr=name=>{const at=ORDER.findIndex(o=>o[0]===name),nx=ORDER[at+1]||ORDER[1],pv=at>1?ORDER[at-1]:null;return [pv&&[hashOf(pv[0]),pv[2]],nx&&[hashOf(nx[0]),nx[2]]]};
 const moverFor=name=>{
   const r=S.rooms[name];if(!r?.stops)return null;
   if(!movers[name]){
-    const at=ORDER.findIndex(o=>o[0]===name),nx=ORDER[at+1];
+    const [pv,nx]=S.nbr(name);
     r.settled=s=>{const g=G[r.piece?.(s)],t=g?g.id:null;if(t!==(tails[name]||null)||!location.hash.endsWith(t))setTail(t)};
-    movers[name]=mover(name,r,nx&&[hashOf(nx[0]),nx[2]]);
+    movers[name]=mover(name,r,nx,pv);
   }
   return movers[name];
 };
 function setTail(t){
   const name=S.room;tails[name]=t;
-  if(!isOpen()&&!film)history.replaceState(null,'',roomHash(name));
+  if(!isOpen())history.replaceState(null,'',roomHash(name));
 }
 S.setTail=setTail;
 const roomHash=n=>hashOf(n)+(tails[n]?(n==='cover'?'':'/')+tails[n]:'');
-const parse=()=>{const [n,...a]=location.hash.replace(/^#\/?/,'').split('/');return [n||'cover',a.join('/')]};
+const parse=()=>{const [n,...a]=location.hash.replace(/^#\/?/,'').split('/');return [n==='closet'?'index':n||'cover',a.join('/')]};
 
 // Where a room lands: its own URL tail, then the garment carried from the last room, then its last place.
 function stopFor(name,arg,carry){
@@ -45,9 +48,13 @@ function arrive(name,arg,carry,playing){
   root.classList.toggle('ix',name==='index');
   const sec=ORDER.find(o=>o[0]===name);
   for(const s of secs)s.hidden=s.id!==sec[1];
-  document.title=name==='cover'?'soescloset, Pullover Hoodies':`soescloset, ${sec[2]}`;
+  document.title=name==='cover'?'soescloset':`soescloset, ${sec[2]}`;
   say.textContent=sec[2];
   mark(name);
+  for(const k in S.rooms)S.rooms[k].bar?.chip.classList.toggle('on',k===name);
+  r?.bar?.set();
+  S.bgNow?.();
+  for(const g of G)g.hi=false; // full-size pictures are let go on every room change; the new room asks again for what it shows big (Hood alone held all 17, ~170 MB)
   if(name==='index'){S.measure();scrollTo(0,ixY);return}
   if(!playing){
     const m=moverFor(name);
@@ -60,7 +67,7 @@ function arrive(name,arg,carry,playing){
 function mark(name){
   const cur=navs.find(a=>a.getAttribute('href')===hashOf(name)),cb=document.getElementById('chrome').getBoundingClientRect();
   navs.forEach(a=>a===cur?a.setAttribute('aria-current','page'):a.removeAttribute('aria-current'));
-  navNow.textContent=cur?cur.textContent.trim():'Rooms';
+  navNow.textContent=cur?cur.textContent.trim():'Menu';
   if(!cur){hair.style.transform=`translate3d(${hair._x||0}px,${hair._y||0}px,0) scaleX(0)`;return}
   const b=cur.firstElementChild.getBoundingClientRect();hair._x=b.left-cb.left;hair._y=Math.round(b.bottom-cb.top+1);
   hair.style.transform=`translate3d(${hair._x}px,${hair._y}px,0) scaleX(${b.width})`;
@@ -73,47 +80,24 @@ const menu=on=>{navEl.classList.toggle('open',on);navBtn.setAttribute('aria-expa
 navBtn.addEventListener('click',()=>menu(!navEl.classList.contains('open')));
 navEl.addEventListener('click',()=>menu(false));
 
-function targetOf(name,arg,carry){
-  const m=moverFor(name);
-  return m?m.pOf(stopFor(name,arg,carry)??m.stop()):S.rooms[name].at();
-}
+// Every room change is the page turn: the new room slides up whole over the old one, which recedes (down over it when going back).
+// The old picture is a still, and the new room is drawn settled (S.jump) inside the callback, so no frame of it is caught mid-move.
+const rank=n=>ORDER.findIndex(o=>o[0]===n);
 function transit(name,arg){
   const from=S.room,carry=pieceNow();
-  cancelAnimationFrame(film);film=0;
-  const onStage=from!=='index'&&name!=='index';
-  if(onStage&&!S.reduced){
-    const to=targetOf(name,arg,carry),a=S.tp;
-    if(Math.abs(to-a)<FILM_MAX)return playFilm(name,arg,carry,a,to);
-  }
-  if(S.reduced)return arrive(name,arg,carry),S.draw(performance.now());
-  const g=carry>=0&&from!=='index'?G[carry]:null;
   if(!document.startViewTransition){
     arrive(name,arg,carry);S.draw(performance.now());
     stage.classList.remove('stage-in');void stage.offsetWidth;stage.classList.add('stage-in');
     return;
   }
-  if(g)g.el.style.viewTransitionName='carry';
-  const clear=()=>{if(g)g.el.style.viewTransitionName=''};
-  const vt=document.startViewTransition(()=>{
-    arrive(name,arg,carry);S.draw(performance.now());
-    if(g&&(name==='index'||!(S.live[carry]?.o>.3)))clear();
-  });
-  vt.ready.catch(()=>{});vt.updateCallbackDone.catch(()=>{});vt.finished.catch(()=>{}).finally(clear);
-}
-function playFilm(name,arg,carry,a,to){
-  arrive(name,arg,carry,true);
-  const t0=performance.now(),d=Math.min(1900,Math.max(700,Math.abs(to-a)*420));
-  const go=t=>{
-    const k=Math.min(1,(t-t0)/d);
-    S.tp=lerp(a,to,k<.5?2*k*k:1-(-2*k+2)**2/2);
-    if(k<1){film=requestAnimationFrame(go);return}
-    film=0;const m=moverFor(name);if(m)m.enter(stopFor(name,arg,carry));
-  };
-  film=requestAnimationFrame(go);
+  if(rank(name)<rank(from))root.dataset.turn='back';else delete root.dataset.turn;
+  const vt=document.startViewTransition(()=>{arrive(name,arg,carry);S.draw(performance.now())});
+  vt.ready.catch(()=>{});vt.updateCallbackDone.catch(()=>{});vt.finished.catch(()=>{}).finally(()=>{if(!document.activeViewTransition||document.activeViewTransition===vt)delete root.dataset.turn});
 }
 
 function route(){
   if(window.OLD[location.hash]){location.replace(window.OLD[location.hash]);return}
+  if(/^#\/index(\/|$)/.test(location.hash))history.replaceState(null,'',location.hash.replace('#/index','#/closet'));
   const [name,arg]=parse();
   if(name==='piece'){
     const i=idOf(arg);
@@ -164,7 +148,7 @@ S.stepPiece=(id)=>location.replace('#/piece/'+id);
 let down=null;
 stage.addEventListener('pointerdown',e=>{down={x:e.clientX,y:e.clientY,t:e.timeStamp}},true);
 stage.addEventListener('click',e=>{
-  if(film||!down||e.target.closest('[data-piece],a,input,.pick,.pos,#wallSort,#dyeKey'))return;
+  if(!down||e.target.closest('[data-piece],a,input,.pick,.pos,#wallSort,#dyeKey'))return;
   if(Math.hypot(e.clientX-down.x,e.clientY-down.y)>8||e.timeStamp-down.t>400)return;
   const i=S.rooms[S.room]?.pick?.();
   if(i>=0)S.openPiece(G[i]);
@@ -178,20 +162,44 @@ document.addEventListener('click',e=>{
 addEventListener('keydown',e=>{
   if(e.key==='Escape'&&navEl.classList.contains('open')){menu(false);navBtn.focus();return}
   if(isOpen()||e.altKey||e.ctrlKey||e.metaKey||e.target.matches?.('input,select,textarea'))return;
-  const m=movers[S.room];if(!m||!m.el.classList.contains('on'))return;
+  const m=movers[S.room],b=S.rooms[S.room]?.bar;
+  if(!m&&b?.n&&(e.key==='ArrowRight'||e.key==='ArrowLeft')){e.preventDefault();b.go(e.key==='ArrowRight'?1:-1,false);return}
+  if(!m||!m.el.classList.contains('on'))return;
   if(e.key==='ArrowRight'||e.key==='ArrowLeft'){e.preventDefault();m.step(e.key==='ArrowRight'?1:-1)}
   else if(e.key==='Home'||e.key==='End'){e.preventDefault();m.step(e.key==='Home'?-99:99)}
   else if(e.key==='PageDown'||e.key==='PageUp'){e.preventDefault();m.step(e.key==='PageDown'?4:-4)}
   else if(e.key===' '&&e.target===document.body){e.preventDefault();m.step(e.shiftKey?-1:1)}
   else if(e.key==='Enter'&&(e.target===document.body)){const i=m.piece();if(i>=0&&i!==null)S.openPiece(G[i])}
 });
+// After a page turn the rest of a trackpad flick belongs to the turn, not to the new room: hushed until the stream pauses for 220 ms.
+let hush=0,lastW=0;
+S.hush=ms=>{hush=performance.now()+ms};
+addEventListener('wheel',e=>{
+  const t=performance.now();
+  if(t<hush&&!e.ctrlKey){if(t-lastW<220)hush=Math.max(hush,t+220);lastW=t;e.preventDefault();e.stopImmediatePropagation()}
+  lastW=t;
+},{capture:true,passive:false});
 addEventListener('wheel',e=>{
   if(e.ctrlKey||isOpen())return; // ctrl-wheel is pinch zoom, and is the user's
-  const m=movers[S.room];if(!m||!m.el.classList.contains('on'))return;
+  const m=movers[S.room];
+  if(!m&&(S.room==='wall'||S.room==='splice')&&!e.target.closest?.('.pick')){e.preventDefault();stillTurn(e);return}
+  if(!m||!m.el.classList.contains('on'))return;
   e.preventDefault();
-  const k=e.deltaMode===1?16:e.deltaMode===2?S.w:1;
-  m.wheel((Math.abs(e.deltaX)>Math.abs(e.deltaY)?e.deltaX:e.deltaY)*k);
+  const [dx,dy]=wheelPx(e,S.w);
+  m.wheel(Math.abs(dx)>Math.abs(dy)?dx:dy);
 },{passive:false});
+
+// Wall and Compare have no rail, so every scroll there is a push past the end: the bar arms on the first gesture and turns on the second.
+// A gesture is one unbroken wheel stream; it counts once, however long it runs, so a single flick can never arm and turn.
+let pull=0,pullT=0,fired=false;
+function stillTurn(e){
+  const t=performance.now(),[dx,dy]=wheelPx(e,S.w),d=Math.abs(dx)>Math.abs(dy)?dx:dy;
+  if(!d)return;
+  if(t-pullT>220||Math.sign(d)!==Math.sign(pull)){pull=0;fired=false} // a pause or a change of direction starts a new gesture
+  pullT=t;pull+=d;
+  if(fired||Math.abs(pull)<(Math.abs(d)<40?160:40))return; // trackpad stream vs mouse notch, the mover's thresholds
+  fired=true;S.rooms[S.room]?.bar?.push(Math.sign(pull));
+}
 
 route();
 S.ready=true;
