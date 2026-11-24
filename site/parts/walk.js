@@ -1,5 +1,6 @@
 import {S,$,G,clamp,mixc,vis,add,ss,lerp} from '../core.js';
-const {q,N,last,reduced}=S;
+import {sec,damp,GRAB} from '../motion.js';
+const {q,N,last}=S;
 const rail=add('<div id="rail"></div>');
 const odo=add('<div id="odo" class="six" aria-hidden="true"><div id="odoIn"></div></div>'),odoIn=odo.firstChild;
 odoIn.innerHTML=G.map(g=>`<p><span>${g.brand}</span></p>`).join('');
@@ -12,7 +13,7 @@ rack.addEventListener('pointermove',e=>{if(rack.hasPointerCapture(e.pointerId))s
 rack.addEventListener('click',e=>e.stopPropagation());
 let rackN=-1,shook=0;
 const tagBox=add(`<div id="tags" aria-hidden="true">${G.map((g,i)=>`<div class="tag"><div><small>${String(i+1).padStart(2,'0')}/${N}</small><b class="six">$${g.label}</b><span>${g.short}${g.col?`<em>${g.col.toLowerCase()}</em>`:''}</span></div></div>`).join('')}</div>`),tags=[...tagBox.children];
-let tagW=150,T=0,wk=-1,lastT=0,speed=0,act=0,belt=0,beltV=0,sag=0,sagV=0,xs=[],held=-1,ringN=-1,push=G.map(()=>0);
+let grab=0,tagW=150,T=0,wk=-1,lastT=0,speed=0,act=0,belt=0,beltV=0,sag=0,sagV=0,xs=[],held=-1,ringN=-1,push=G.map(()=>0);
 const HOOK=52/1600,YAW=66;let RAIL=62; // hook length in canvas units, the rod's height just under the chrome, and how far a closed piece stands edge-on
 const typeH=()=>Math.round(S.h*(S.pt?.19:.17));
 const hovers=matchMedia('(hover:hover) and (pointer:fine)').matches;
@@ -48,7 +49,7 @@ function turn(dt,snap){
   const h=held,c=size();
   push.fill(0);
   G.forEach((g,i)=>{
-    const u=i-T,bell=1-ss(clamp(Math.abs(u))),open=i===h?1:h>=0?bell*.3:bell,side=h>=0&&i!==h&&bell>0?Math.sign(i-h):u<0?-1:1,to=-side*YAW*(1-open);
+    const u=i-T,bell=1-ss(clamp(Math.abs(u))),open=i===h?1:h>=0?bell*.3:bell,side=h>=0&&i!==h&&bell>0?Math.sign(i-h):u<0?-1:1,to=g.ywTo=-side*YAW*(1-open);
     if(snap){g.yw=to;g.ywv=0;g.hv=i===h?1:0;g.hvv=0}
     else{
       g.ywv+=(-155*(g.yw-to)-19.5*g.ywv)*dt;g.yw+=g.ywv*dt;
@@ -98,16 +99,17 @@ S.part('walk',{segs:[['walk',last*.52]],
     if(q.hero>=1)$('ground').classList.add('open'); // a deep link never runs the opening, so its slit would stay lit on this wall
     // Hang-and-part belongs to the rack: claim the stacking while it is on, the nearest to the open slot on top.
     if(q.wallIn<.5){const n=Math.round(T),h=held;S.stack=[`r${n}.${h}`,i=>i===h?200:100-Math.abs(i-n)]}
+    // Sharp pictures go to the open piece, its neighbors and the one under the pointer, so turning to the next never shows a soft-to-sharp swap.
+    if(q.wallIn<.5&&S.room==='walk'){const n=Math.round(T);S.want=()=>[n-1,n,n+1,held].filter(i=>i>=0&&i<N)}else S.want=null;
     // The open slot drifts along the rail, so the focus ring has to follow it.
     const nr=Math.round(T);
     if((nr!==ringN||S.jump)&&S.room==='walk'&&S.moverEl){ringN=nr;S.moverEl.style.setProperty('--bx',slotAt(nr)-size()*.3+'px')}
-    if(reduced||S.jump){
-      belt=lastT=T;act=Math.round(T);beltV=sagV=sag=speed=0;
+    if(S.jump){
+      belt=lastT=T;act=Math.round(T);beltV=sagV=sag=speed=grab=0;
       for(const g of G){g.lag=g.lagV=g.pull=0;g.px=null}
       turn(0,true);
-      if(reduced)return;
     }
-    const dt=Math.max(S.dt,1)/1000,rv=(T-lastT)/dt;lastT=T;
+    const dt=Math.max(sec(S.dt),.001),rv=(T-lastT)/dt;lastT=T; // round 3: dt capped at 1/30 s
     // First arrival: the queue bumps toward the open piece and swings, so the rack says it can be pushed before anyone tries.
     if(S.room==='walk'&&shook>=0&&q.hero>=1){
       if(!shook)shook=S.now+900;
@@ -120,8 +122,9 @@ S.part('walk',{segs:[['walk',last*.52]],
       const d=Math.abs(i-T),k=170/(1+d*.7);
       g.lagV+=(-k*g.lag-1.24*Math.sqrt(k)*g.lagV)*dt;g.lag=clamp(g.lag+g.lagV*dt-rv*dt,-.6,.6);
       // Drag on the cloth is its own travel along the rail: the live piece is steadied, the queue barely moves so barely swings.
+      // v5: a little more pull (was 2.2, cap 1.3) so a moving rail swings each piece a degree or two from its hanger.
       const P=S.base(i,T),vn=g.px===null?0:(P.x-g.px)/dt/P.c;g.px=P.x;
-      g.pull+=(clamp(vn*2.2,-1.3,1.3)*(.5+.5*Math.min(1,d))-g.pull)*(1-Math.exp(-dt/(.04+.035*d)));
+      g.pull+=(clamp(vn*3,-1.8,1.8)*(.5+.5*Math.min(1,d))-g.pull)*(1-Math.exp(-dt/(.04+.035*d)));
       g.swv+=24.5*g.pull*dt;
     });
     // Crossing a piece knocks the pair either side of it apart, as far as the rail was moving.
@@ -132,7 +135,10 @@ S.part('walk',{segs:[['walk',last*.52]],
     }
     // The rod takes the load: it dips with speed and rings once on the stop.
     sagV+=(-140*(sag-Math.min(3.5,speed*1.1))-9*sagV)*dt;sag+=sagV*dt;
-    beltV+=(-70*(belt-(held>=0?held:T))-13*beltV)*dt;belt+=beltV*dt;
+    // round 3: the name belt follows the rail by damping (maath-style), not a spring; beltV keeps its speed for busy().
+    {const b0=belt;belt=damp(belt,held>=0?held:T,9,dt);beltV=(belt-b0)/dt}
+    // Held rail: the pieces grow 2% while the hand has them, as shoe-finder's tiles do.
+    grab=damp(grab,S.moverEl?.classList.contains('drag')&&S.room==='walk'?1:0,14,dt);if(grab<.001)grab=0;else if(grab>.999)grab=1;
     // Cloth: the hem follows the hood late. Tag: k27 c1.8 sits just above the swing's resonance, which holds it about 200ms behind the garment.
     const kh=1-Math.exp(-dt/.09);
     for(const g of G){
@@ -140,6 +146,7 @@ S.part('walk',{segs:[['walk',last*.52]],
       g.tgv+=(-27*(g.tga-g.sw*.3-g.pull)-1.8*g.tgv)*dt;g.tga+=g.tgv*dt;
     }
   },
+  pose(i,P){if(grab)P.c*=1+(GRAB-1)*grab;return P},
   draw(){
     const inWalk=clamp(q.hero*2)*(1-clamp(q.wallIn*2.2));
     rail.style.transform=`translate3d(0,${(RAIL+sag).toFixed(2)}px,0)`;vis(rail,inWalk);
@@ -173,9 +180,14 @@ S.part('walk',{segs:[['walk',last*.52]],
     if(hovers&&q.wallIn<.2&&q.hero>.3&&speed<.6&&!S.moverEl?.classList.contains('drag'))h=under();
     if(h!==held){
       // Pushing a hanger aside knocks the ones either side of it, and its tag is the last to settle.
-      if(!reduced&&h>=0){if(G[h-1])G[h-1].swv-=16;if(G[h+1])G[h+1].swv+=16;G[h].tgv+=26}
+      if(h>=0){if(G[h-1])G[h-1].swv-=16;if(G[h+1])G[h+1].swv+=16;G[h].tgv+=26}
       held=h;
     }
     S.noTip=true;return h; // the piece's own tag names it
+  },
+  // The rack is at rest once every spring is below what a pixel can show; core then lets the loop sleep.
+  busy(){
+    if(shook>0||grab>0&&grab<.999||speed>.01||Math.abs(sag)>.02||Math.abs(sagV)>.02||Math.abs(beltV)>.002||Math.abs(belt-(held>=0?held:T))>.001)return true;
+    return G.some((g,i)=>Math.abs(g.hv-(i===held?1:0))>.002||Math.abs(g.lag)>.0005||Math.abs(g.lagV)>.002||Math.abs(g.pull)>.003||Math.abs(g.ywv)>.05||Math.abs(g.yw-(g.ywTo||0))>.02||Math.abs(g.hvv)>.005||Math.abs(g.tgv)>.5||Math.abs(g.tga-g.sw*.3-g.pull)>.1||Math.abs(g.sw-g.hem)>.005);
   },
 });

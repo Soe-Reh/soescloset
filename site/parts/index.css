@@ -1,97 +1,127 @@
 /* Chrome: spans every room. No bar, fade or blur, so nothing ever sits on a garment but the letters themselves. */
 body>.chrome{position:fixed;z-index:20;color:var(--ink);pointer-events:none}
 body>.chrome a{pointer-events:auto;transition:color .18s linear}
-/* Over the black-on-paper index the words invert only where they cross a letter. */
-body>.chrome.over{color:#fff;mix-blend-mode:difference}
+/* In the Closet the words take the room's own ink (grey or the flood's AA-checked ink); a difference blend went low-contrast on mid-tone floods. */
+/* A thin halo in the room's own colour: invisible on the plain ground, it keeps each letter readable when a garment drifts under the bar. */
+body>.chrome.over{color:var(--xink,#111)}
+body>.chrome.over:not(:has(nav.open)) :is(a,#navBtn){text-shadow:0 0 1px var(--xbg,#e1e1df),0 0 3px var(--xbg,#e1e1df),0 0 6px var(--xbg,#e1e1df)}
+/* Text and its halo fade on the same curve as the room, so no frame shows light-on-light (a fast color over a slow ground read as a flash). */
+body>.chrome.over,body>.chrome.over :is(a,#navBtn){transition:color .5s cubic-bezier(.4,0,.2,1),text-shadow .5s cubic-bezier(.4,0,.2,1)}
 /* Beats tint the nav inline; none of that may survive onto the sheet. */
 body>.chrome.over a,body>.chrome.end a,body>.chrome.over nav,body>.chrome.end nav,body>.chrome.mast a,body>.chrome.mast nav{color:inherit!important}
 /* From the wall to the splice the words stand on a band of the page's own paper, so nothing passing under them can strike them. */
 body>.chrome.mast{color:var(--black)}
-#mast{position:absolute;z-index:8;left:0;right:0;top:0;height:52px;background:var(--paper);pointer-events:none;visibility:hidden}
+body>.chrome.mast:not(:has(nav.open)) :is(a,#navBtn){text-shadow:0 0 1px var(--ground),0 0 3px var(--ground),0 0 6px var(--ground)}
+#mast{display:none} /* was a solid band behind the bar in Wall to Price; it hid the background lines there only. The letters' halo below keeps them readable instead, as in the Closet. */
 @media (max-width:760px){#mast{height:46px}}
 body>.chrome.end{color:var(--accent)}
 #nav a,#nav a.on{border-color:transparent}
 
 #index[hidden]{display:none}
-#index{position:relative;z-index:2;background:var(--paper);color:var(--black)}
-#ixhead{display:flex;justify-content:space-between;padding:96px 20px 28px}
-#ixhead h2{font:inherit}
-#ixrows{list-style:none;padding:0 20px}
-.ixrow{position:relative;display:grid;grid-template-columns:44px 1fr 30vw;gap:clamp(14px,3svh,30px) 12px;padding:9px 0 calc(var(--ixfs,15vw)*.05)}
-.ixrow::before{content:"";position:absolute;left:0;right:0;top:0;height:1px;background:var(--black);transform-origin:0 0;transition:transform 1.1s cubic-bezier(.22,1,.36,1)}
-.ixl{padding-top:1px}
-.ixn{grid-row:2;grid-column:1/-1;overflow:hidden;font-size:var(--ixfs,15vw);padding:.05em 0 .022em;margin-bottom:-.05em;line-height:.9}
-.ixn a{display:block;width:max-content;max-width:100%;white-space:nowrap}
-.ixn span{display:block;transition:transform .45s cubic-bezier(.22,1,.36,1),opacity .5s ease}
-.ixp{grid-row:1;grid-column:3;list-style:none;transition:opacity .5s ease}
-.ixp a{scroll-margin:64px;display:grid;grid-template-columns:26px 1fr auto;gap:0 8px;padding:1px 0 3px}
-.ixp img{display:none}
-.num{font-variant-numeric:tabular-nums}
-.ixp b{font-weight:400;grid-column:1}
-.ixp span{transition:opacity .3s ease}
-
-/* One row answers: everything else steps back, its name leans toward the piece. */
-#ixrows.live .ixrow:not(.act) .ixn span{opacity:.2}
-#ixrows.live .ixrow:not(.act) .ixp{opacity:.55}
-#ixrows.live .ixrow.act .ixn span{transform:translateX(14px)}
-#ixrows.live .ixrow.act .ixp a:not(.act){opacity:.6}
-
-/* Rows arrive with the scroll: the rule draws, then the name rises out of its own line. */
-#index.rv .ixrow:not(.in)::before{transform:scaleX(0)}
-#index.rv .ixrow:not(.in) .ixn span{transform:translateY(104%);transition:none}
-#index.rv .ixrow:not(.in) .ixp,#index.rv .ixrow:not(.in) .ixl{opacity:0}
-#index.rv .ixrow.in .ixn span{animation:ix-rise 1s cubic-bezier(.22,1,.36,1) backwards}
-#index.rv .ixrow.in .ixl{transition:opacity .6s .25s}
-#index.rv .ixrow.in .ixp{transition:opacity .6s .25s}
-@keyframes ix-rise{from{transform:translateY(104%)}}
-
-/* The reel. Its position restarts one 500ms transition per pointer move, so quick moves trail softly. */
-#reel{position:fixed;left:0;top:0;z-index:5;width:var(--rs);height:var(--rs);--rs:min(52svh,640px);pointer-events:none;transition:transform .5s cubic-bezier(.22,1,.36,1);will-change:transform}
-#reelT{position:absolute;inset:0;transform-origin:50% 6.25%}
-#reelS{position:absolute;inset:0;overflow:hidden;opacity:0;transform:scale(.72);transform-origin:50% 40%;transition:transform .4s cubic-bezier(.22,1,.36,1),opacity .24s linear}
-#reel.on #reelS{opacity:1;transform:none}
-.rsl{position:absolute;inset:0;visibility:hidden;will-change:transform}
-.rsl.on{visibility:visible}
-.rsl img{position:absolute;inset:0;width:100%;height:100%}
-
-/* Ending: the opening's room and wordmark, its doors now closing, with everything on one rail by price. */
-#end{position:relative;height:240svh}
-#endPin{position:sticky;top:0;height:100svh;overflow:hidden;contain:strict;container-type:size;color:var(--accent)}
-#endRail{position:absolute;left:0;right:0;top:0;height:1px;background:currentColor;transform-origin:0 0}
-.eg{position:absolute;left:0;top:0;will-change:transform}
-.eg img{position:absolute;inset:0;width:100%;height:100%;display:block}
-#endW{position:absolute;left:0;top:0;white-space:nowrap;line-height:.82;overflow:hidden;padding-top:.02em;transform-origin:0 0;
-  font-size:calc(98.5cqw/var(--wm));transform:translate(.75cqw,calc(100cqh - .84em - 34px))}
-#endW span{display:inline-block;will-change:transform}
-.endT{position:absolute;white-space:nowrap}
-#endLo{left:20px}#endHi{right:20px}
-#endN{position:absolute;left:20px;right:20px;bottom:10px;display:flex;justify-content:space-between;gap:20px}
-@container (max-aspect-ratio:20/23){
-  #endW{font-size:calc((100cqh - 190px)/var(--wm));transform:translate(calc((100cqw + .84em)/2),112px) rotate(90deg)}
-  #endN{flex-direction:column;gap:0}
-}
-#endN p+p{text-align:right}
-@container (max-aspect-ratio:20/23){#endN p+p{text-align:left}}
-
-@media (max-width:760px),(hover:none){
-  #reel{display:none}
-  .ixrow{grid-template-columns:1fr;padding-bottom:30px}
-  .ixl{position:absolute;right:0;top:9px}
-  .ixn{grid-row:auto;margin-top:18px;margin-bottom:10px}
-  .ixp{grid-row:auto;grid-column:auto}
-  /* No hover here, so the reel's cutouts stand in the row: one size for every piece, whatever it costs. */
-  .ixp{display:grid;grid-template-columns:1fr 1fr;gap:18px 12px}
-  .ixp a{display:block;padding:0}
-  .ixp img{display:block;width:100%;aspect-ratio:1;object-fit:cover;object-position:50% 40%}
-  .ixp b{display:block;margin-top:4px}
-  .ixp span{display:block}
-}
-@media (prefers-reduced-motion:reduce){
-  #reel,#reelS,.ixn span,.ixp,.ixrow::before{transition:none!important}
-  .ixn span{animation:none!important}
+/* The Closet: one screen, the field above a single quiet footer line. Studio grey, flooded in the colour of the piece that is up. */
+#index{position:relative;z-index:2;height:100svh;display:flex;flex-direction:column;background-color:#e1e1df;color:#111;transition:background-color .5s cubic-bezier(.4,0,.2,1),color .5s cubic-bezier(.4,0,.2,1)}
+#ex{position:relative;flex:1;min-height:0}
+#exField{position:absolute;inset:0;overflow:hidden;touch-action:none;cursor:grab;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+#ex.grab #exField{cursor:grabbing}
+html.nosel,html.nosel *{user-select:none!important;-webkit-user-select:none!important}
+.xt{position:absolute;left:0;top:0;width:var(--t);height:var(--t);will-change:transform;transform-origin:50% 40%;outline-offset:-6px}
+.xt img{display:block;width:100%;height:100%;pointer-events:none;-webkit-user-drag:none}
+.xt.near{z-index:3}
+/* Brand and price under the lifted piece only. */
+.xm{position:absolute;left:50%;top:91%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:1px;white-space:nowrap;font-size:12px;line-height:15px;font-variant-numeric:tabular-nums;opacity:0;transition:opacity .2s linear;pointer-events:none}
+.xm b{font-weight:600;font-stretch:75%;letter-spacing:.07em;text-transform:uppercase;font-size:11px}
+.xm i{display:block;width:18px;height:3px;margin-top:2px}
+.xt.near .xm,.xt:focus-visible .xm{opacity:1}
+/* Row labels when the field is sorted. Price bands carry their own swatch from the ramp. */
+.xl{position:absolute;left:0;top:0;display:flex;align-items:center;gap:6px;white-space:nowrap;font-size:12px;font-weight:600;font-stretch:75%;letter-spacing:.07em;text-transform:uppercase;pointer-events:none}
+.xl i{width:10px;height:10px}
+.xl span{font-weight:400;letter-spacing:0}
+/* The island bar floats over the field: sort, find, compare. Dark pill, the pressed one in the room's own grey: no accent. */
+#exBar{position:absolute;left:50%;bottom:16px;transform:translateX(-50%);z-index:5;display:flex;align-items:center;gap:2px;padding:4px;background:#111;color:#e1e1df;border-radius:999px;font-size:13px;font-weight:600;font-stretch:88%;box-shadow:0 10px 30px rgba(0,0,0,.18);max-width:calc(100% - 32px)}
+#exBar .xs{display:flex;align-items:center;gap:2px}
+#exBar .xsep{flex:none;width:1px;height:22px;margin:0 6px;background:rgba(225,225,223,.22)}
+#exFind{height:44px;padding:0 12px;border-bottom:0;border-radius:999px;min-width:150px;max-width:220px;font-weight:600}
+#exFind:hover{background:#2a2a29}
+#exFind:focus-visible{outline:2px solid #e1e1df;outline-offset:2px}
+#exFind::before{content:"";flex:none;width:13px;height:13px;background:currentColor;-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Ccircle cx='7' cy='7' r='5' fill='none' stroke='%23000' stroke-width='1.6'/%3E%3Cpath d='M11 11l4 4' stroke='%23000' stroke-width='1.6'/%3E%3C/svg%3E") center/contain no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Ccircle cx='7' cy='7' r='5' fill='none' stroke='%23000' stroke-width='1.6'/%3E%3Cpath d='M11 11l4 4' stroke='%23000' stroke-width='1.6'/%3E%3C/svg%3E") center/contain no-repeat}
+#exFind .cb-cur{color:#b9b9b6;font-weight:400}
+#exFind .cb-th{display:none}
+/* Compare two is a mode: pressed, it turns paper-coloured and reads Cancel; the status line above the bar counts the picks. */
+#exPick{position:absolute;z-index:5;left:50%;bottom:76px;transform:translateX(-50%);margin:0;padding:9px 16px;border-radius:999px;background:var(--paper);color:var(--black);font-size:13px;line-height:18px;white-space:nowrap;box-shadow:0 6px 20px rgba(0,0,0,.14)}
+#exPick[hidden]{display:none}
+#exPick span{margin-left:8px;font-weight:600;font-variant-numeric:tabular-nums;opacity:.6}
+#ex.picking #exField{cursor:copy}
+.xt.picked::after{content:attr(data-n);position:absolute;left:12%;top:4%;display:grid;place-items:center;width:28px;height:28px;border-radius:50%;background:#111;color:#f6f6f4;font-size:13px;font-weight:600;box-shadow:0 0 0 2px #f6f6f4}
+.xt.picked .xm{opacity:1}
+#ex.picking .xt:not(.picked) img{opacity:.9}
+/* Views: the other rooms, each with a tiny preview made of the pieces themselves. */
+#exViews{position:absolute;z-index:5;left:20px;top:58px;display:flex;align-items:flex-end;gap:8px}
+#exViews .xvl{align-self:center;margin-right:4px;font-size:11px;font-weight:600;font-stretch:75%;letter-spacing:.09em;text-transform:uppercase}
+.vw{display:flex;flex-direction:column;gap:4px;width:78px;padding:4px 4px 6px;border-radius:6px;background:var(--paper);color:var(--black);box-shadow:0 4px 14px rgba(0,0,0,.08);transition:transform .25s cubic-bezier(.16,1,.3,1),box-shadow .25s}
+.vw:hover{transform:translateY(-3px);box-shadow:0 8px 20px rgba(0,0,0,.14)}
+.vw b{font-size:11px;line-height:13px;font-weight:600;font-stretch:75%;letter-spacing:.07em;text-transform:uppercase;padding-left:2px}
+.vp{position:relative;display:block;height:46px;border-radius:3px;background:#e1e1df 50% 50%/cover no-repeat;overflow:hidden}
+.vp i{position:absolute;display:block}
+.vp-walk i{top:6%;width:62%;height:100%;left:19%;background:50% 0/contain no-repeat}
+.vp-walk i:nth-child(1){left:52%;transform:perspective(80px) rotateY(-55deg) scale(.86)}
+.vp-walk i:nth-child(2){left:-14%;transform:perspective(80px) rotateY(55deg) scale(.86)}
+.vp-wall{display:flex;gap:1px;padding:0 2px}
+.vp-wall i{position:static;flex:1;height:100%;background:50% 40%/420% no-repeat}
+.vp-cmp i{top:0;bottom:0;width:50%;background-size:200% auto;background-repeat:no-repeat}
+.vp-cmp i:first-child{left:0;background-position:0 30%}
+.vp-cmp i:last-child{right:0;background-position:100% 30%;box-shadow:-1px 0 0 #111}
+.vp-hood{background-position:50% 4%;background-size:230%}
+.vp-avg{background-image:url(../img/average-mean.webp);background-size:contain}
+.vp-price{display:flex;align-items:flex-end;gap:1px;padding:4px 4px 0}
+.vp-price i{position:static;flex:1}
+#exBar .xn{padding:0 12px 0 14px;font-weight:400;color:#b9b9b6;white-space:nowrap}
+#exBar button{display:flex;align-items:center;min-height:44px;padding:0 15px;border-radius:999px;white-space:nowrap;transition:background-color .2s,color .2s}
+#exBar button:hover{background:#2a2a29}
+#exBar button[aria-pressed=true]{background:#e1e1df;color:#111}
+#exBar button:focus-visible{outline:2px solid #e1e1df;outline-offset:2px}
+/* Footer: the suggest box and the contact line, small and out of the way. */
+#exFoot{flex:none;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:6px 24px;padding:8px 20px 10px;border-top:1px solid color-mix(in srgb,currentColor 22%,transparent);font-size:12px;line-height:16px}
+/* Three parts: suggest on the left, who made it in the middle (under the Sort bar's centre line), the way on into the rooms on the right, in the corner where every room keeps its bar. */
+@media (min-width:761px){#exFoot{display:grid;grid-template-columns:1fr auto 1fr}#exFoot>p{text-align:center}}
+#exFoot #exNext{justify-self:end;display:flex;align-items:center;gap:8px;min-height:40px;padding:0 14px;background:var(--paper);color:var(--black);font-size:12px;font-weight:600;font-stretch:75%;letter-spacing:.07em;text-transform:uppercase;text-decoration:none}
+#exNext svg{width:16px;height:10px;fill:none;stroke:currentColor;stroke-width:1.2;transition:translate .2s var(--ease)}
+#exNext:hover svg{translate:3px 0}
+#exNext:focus-visible{outline:2px solid #111;outline-offset:2px}
+@media (min-width:761px) and (max-height:520px){#sug label{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}#sugUrl{width:170px}#exFoot{padding-block:6px}}
+#exFoot a{text-decoration:underline;text-underline-offset:2px;text-decoration-thickness:1px;color:inherit}
+@media (pointer:coarse){#exFoot p a{padding:15px 4px}}
+#sug{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+#sug label{font-weight:600}
+#sugUrl{width:240px;height:36px;padding:0 14px;border:1px solid #6d6d6a;border-radius:999px;background:#ececea;color:#111;font:inherit}
+#sugUrl::placeholder{color:#5c5c59}
+#sugUrl[aria-invalid=true]{border-color:#111;border-width:2px}
+#sug .btn{min-height:36px;padding:0 16px;font-size:12px}
+#sug button:focus-visible,#sugUrl:focus-visible{outline:2px solid #111;outline-offset:2px}
+#sugSay{color:inherit}
+#sugSay:empty{display:none}
+@media (max-width:760px){#sugSay{flex-basis:100%}}
+@media (max-width:760px){
+  /* Phone: find and compare on top, the six sorts below, all in thumb reach. */
+  #exBar{left:8px;right:8px;transform:none;max-width:none;flex-wrap:wrap;justify-content:space-between;bottom:10px;border-radius:24px;font-size:12px}
+  #exBar .xn,#exBar .xsep{display:none}
+  #exBar .xs{order:2;flex-basis:100%}
+  #exBar .xs button{flex:1;justify-content:center;padding:0 4px}
+  #exFind{flex:1;min-width:0;max-width:none}
+  #exCmp{padding:0 14px}
+  #exPick{bottom:128px;font-size:12px;max-width:calc(100% - 32px);white-space:normal;text-align:center}
+  #exViews{left:16px;right:16px;top:52px;gap:6px}
+  #exViews .xvl{display:none}
+  .vw{flex:1;min-width:0;width:auto;padding:3px 3px 5px}
+  .vw b{font-size:10px;letter-spacing:.04em;padding-left:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .vp{height:38px}
+  #exFoot{padding:8px 16px 10px}
+  #exFoot #exNext{margin-left:auto;min-height:44px}
+  #sug{width:100%}
+  #sug label{flex:none}
+  #sugUrl{flex:1;min-width:0;width:auto;height:44px}
+  #sug .btn{min-height:44px}
 }
 
 /* Seams between beats. A hidden parent does not hide children that set their own visibility, so a fast scroll could leave the hood's rooms stuck on screen behind later beats. */
 #hrooms[style*="hidden"]>*,#strip[style*="hidden"]>*{visibility:hidden!important}
 
-#ixnote{max-width:46ch;margin:48px 20px 32px;font-size:13px;line-height:1.5;opacity:.7}
