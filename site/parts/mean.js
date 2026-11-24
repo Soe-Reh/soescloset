@@ -1,160 +1,123 @@
-import {S,G,$,clamp,ss,sss,lerp,hold,vis,money,fitWidth,add,CT,HH} from '../core.js';
+import {S,G,clamp,ss,sss,lerp,vis,money,add,hex,css,mixc,CT,HH} from '../core.js';
 const {q,N,last}=S;
-const sh=G.map(g=>+g.shoulder_width_ratio||0),known=sh.filter(v=>v>0),iWide=sh.indexOf(Math.max(...known)),iNarrow=sh.indexOf(Math.min(...known));
-const ratio=v=>v.toFixed(3).slice(1),cents=v=>money(Math.round(v*100)/100);
-// Pieces land cheapest first, so the running mean creeps and then the dearest pieces drag it. Each still counts exactly once.
-const prices=G.map(g=>g.price),order=G.map((_,i)=>i).sort((a,b)=>prices[a]-prices[b]),rank=[];order.forEach((i,r)=>rank[i]=r);
-const runMean=[];order.reduce((s,i,r)=>(runMean[r]=(s+prices[i])/(r+1),s+prices[i]),0);
-const mean=runMean[last],below=prices.filter(p=>p<mean).length,meanSh=known.reduce((a,b)=>a+b,0)/known.length;
+// The story, one mover stop each: outlines, the blended shape, its price, the nearest and furthest piece, then three findings.
+const prices=G.map(g=>g.price),sorted=[...prices].sort((a,b)=>a-b),lo=sorted[0],hi=sorted[N-1];
+const mean=prices.reduce((a,b)=>a+b,0)/N,median=N%2?sorted[N>>1]:(sorted[N/2-1]+sorted[N/2])/2;
+const rank=[];G.map((_,i)=>i).sort((a,b)=>prices[a]-prices[b]||a-b).forEach((i,r)=>rank[i]=r);
+const fabric=g=>(g.material||'').toLowerCase(),dear=G[prices.indexOf(hi)];
+const twins=G.filter(g=>fabric(g)===fabric(dear)),twin=twins.reduce((a,b)=>b.price<a.price?b:a,dear);
+const usd=n=>money(Math.round(n));
+// Same log scale and ends as the Wall: price is the only data colour.
+const tone=p=>css(mixc(hex('#b3b3ae'),hex('#111111'),hi>lo?Math.log(p/lo)/Math.log(hi/lo):1));
 
-const letters=s=>[...s].map(c=>`<i>${c}</i>`).join('');
-const word=add(`<div class="big six" id="word" aria-hidden="true"><span class="half">${letters('Ave')}</span><span class="half">${letters('rage')}</span></div>`);
-const halves=[...word.children],ls=[...word.querySelectorAll('i')];
-// Inside the garment layer, so a piece arriving lies over the mean and a piece leaving uncovers it.
-const canvas=()=>{const c=document.createElement('canvas');c.width=c.height=600;c.className='meanC';c.setAttribute('aria-hidden','true');c.style.zIndex=150;$('gs').append(c);return c};
-const cvs=[canvas(),canvas()],cxs=cvs.map(c=>c.getContext('2d'));
-const ea=add(`<div class="big six" id="ea" aria-hidden="true"><i>${ratio(sh[iWide])}</i></div>`),eb=add(`<div class="big six" id="eb" aria-hidden="true"><i>${ratio(sh[iNarrow])}</i></div>`);
-const rules=[0,1,2,3].map(()=>add('<div class="rule"></div>'));
-const lab=(g,id)=>add(`<a class="rulelab" id="${id}" href="#/piece/${g.id}" data-piece="${g.id}"><b>${g.brand}</b><br><span class="nm">${g.short}<br></span>$${g.label}</a>`);
-const labs=[lab(G[iWide],'l1'),lab(G[iNarrow],'l2')];
-// The mean wears its own price where the prints have blurred away.
-const mp=document.createElement('div');mp.className='big six';mp.id='mp';mp.setAttribute('aria-hidden','true');mp.innerHTML=`<i>${cents(mean)}</i>`;$('gs').append(mp);
-const nMean=add('<p class="note" id="nMean"></p>'),nStat=add('<p class="note" id="nStat"></p>');
-const nExt=add(`<p class="note" id="nExt">Widest and narrowest shoulder of the ${N}, as a share of garment height. Same hood line, same hem.</p>`);
-const statText=hex=>`<span>${below} of ${N} cost less</span> <span>Mean shoulder ${ratio(meanSh)}</span>${hex?` <span><i style="background:${hex}"></i>${hex}</span>`:''}`;
-const holdText=`All ${N} count once.<br>${money(Math.min(...prices))} weighs what ${money(Math.max(...prices))} weighs.`;
-nStat.innerHTML=statText();
-const sr=document.createElement('p');sr.className='sr';$('mean').append(sr);
-const srText=hex=>{sr.textContent=`The pixel mean of all ${N} pieces. Mean price ${cents(mean)}, ${below} of ${N} cost less, mean shoulder ${ratio(meanSh)}${hex?`, mean colour ${hex}`:''}. Widest shoulder ${ratio(sh[iWide])}: ${G[iWide].name}. Narrowest ${ratio(sh[iNarrow])}: ${G[iNarrow].name}.`};srText();
+const thumb=(g,k)=>`<a class="athumb" href="#/piece/${g.id}" data-piece="${g.id}" aria-label="${k}: ${g.brand} ${g.short}, ${money(g.price)}"><img src="${g.image_600}" alt="" decoding="async"><small>${k}</small>${g.brand}<br>${money(g.price)}</a>`;
+const FINDS=[
+  [hi/lo,v=>v.toFixed(1)+'<small>x</small>',`The gap between the cheapest (${money(lo)}) and the dearest (${money(hi)}).`],
+  [twin.price,usd,`Buys the same ${fabric(dear)} as the ${money(hi)} ${dear.brand}. ${twins.length} of the ${N} are ${fabric(dear)}.`],
+  [median,usd,`The typical price, the median: half the set costs less, half costs more.`],
+];
+const STEPS=[
+  `Here are all ${N} hoodies, traced and stacked on top of each other.`,
+  `Blend them and you get the <b>average premium hoodie</b>: the shape at least half of them share.`,
+  `It would cost <b>${usd(mean)}</b>, yet most of the set costs less: a few expensive pieces pull the average up.<span class="adots" aria-hidden="true"></span>`,
+  '', // filled from average.json below
+  `<span class="afinds">${FINDS.map(f=>`<span class="afind"><b class="six">${f[1](f[0])}</b><span>${f[2]}</span></span>`).join('')}</span>`,
+];
+const LABELS=['Every outline stacked','The average shape',`It would cost ${usd(mean)}`,'Closest and furthest','Three findings'];
+const K=STEPS.length;
 
-// The true running mean, one ImageData per landed piece. Sums are premultiplied, so a pixel's alpha is the share of pieces covering it and the black word shows through in exact proportion. A stack of opacities cannot do this: its result depends on order wherever a garment is transparent.
-const R=[],SZ=600;
-(async()=>{
-  const t=document.createElement('canvas');t.width=t.height=SZ;const c=t.getContext('2d',{willReadFrequently:true});
-  const sum=new Float32Array(SZ*SZ*4),load=src=>new Promise((ok,no)=>{const m=new Image();m.onload=()=>ok(m);m.onerror=no;m.src=src});
-  let cr=0,cg=0,cb=0,ca=0;
-  for(let r=0;r<N;r++){
-    const g=G[order[r]],[a,b]=await Promise.all([load(g.image_shadow),load(g.image_600)]);
-    c.clearRect(0,0,SZ,SZ);c.drawImage(a,0,0,SZ,SZ);c.drawImage(b,0,0,SZ,SZ);
-    const d=c.getImageData(0,0,SZ,SZ).data,o=new ImageData(SZ,SZ),e=o.data;
-    for(let p=0;p<d.length;p+=4){
-      const A=d[p+3]/255;
-      if(A>0){sum[p]+=d[p]*A;sum[p+1]+=d[p+1]*A;sum[p+2]+=d[p+2]*A;sum[p+3]+=A}
-      if(A>.98){cr+=d[p];cg+=d[p+1];cb+=d[p+2];ca++}
-      const s=sum[p+3];if(s>0){e[p]=sum[p]/s;e[p+1]=sum[p+1]/s;e[p+2]=sum[p+2]/s;e[p+3]=255*s/(r+1)}
-    }
-    R[r]=o;
-    await new Promise(k=>setTimeout(k)); // one piece per task, so scrolling never waits on the sum
-  }
-  const hex='#'+[cr,cg,cb].map(v=>Math.round(v/ca).toString(16).padStart(2,'0')).join('');
-  nStat.innerHTML=statText(hex);srText(hex);
-})().catch(e=>console.error('mean',e)); // a piece failed: the row and the word stay, and no mean is claimed from fewer pieces
+// The figure stands in a garment's own frame (the images are traced on the same 1600 canvas), so a landing piece covers its own outline exactly.
+const fig=document.createElement('div');fig.id='afig';fig.setAttribute('aria-hidden','true');
+fig.innerHTML='<img alt="" decoding="async"><img alt="" decoding="async">';document.getElementById('gs').append(fig);
+const [olImg,meanImg]=fig.children;
+const priceEl=add(`<div class="big six" id="aprice" aria-hidden="true"><i>${usd(mean)}</i></div>`);
+const text=add(`<div id="atext">${STEPS.map(s=>`<p class="astep">${s}</p>`).join('')}</div>`);
+const steps=[...text.children],nums=[...text.querySelectorAll('.afind b')],dots=text.querySelector('.adots');let links=[];
+// Prebuilt by tools/build-average.mjs (a pixel distance to the mean). Not awaited at the top: rooms.js routes as soon as it loads, and must find this room.
+fetch('average.json').then(r=>r.json()).then(a=>{
+  const near=G.find(g=>g.id===a.closest),far=G.find(g=>g.id===a.furthest);if(!near||!far)throw new Error('unknown piece');
+  steps[3].innerHTML=`Closest to the average: <b>${near.brand}</b>, ${money(near.price)}. Furthest from it: <b>${far.brand}</b>, ${money(far.price)}.<span class="athumbs">${thumb(near,'Closest')}${thumb(far,'Furthest')}</span>`;
+  links=[...steps[3].querySelectorAll('a')];S.wake();
+}).catch(e=>{console.error('average.json',e);steps[3].textContent='Some pieces sit close to the average shape, others far from it.'});
 
-// Shoulder half-width in canvas px, from the ratio and the garment height in data.json.
-const half=i=>sh[i]*G[i].canvas.garment_height/2;
-let M={},E={},SL=[];
-// One clock over both segments. meanIn is short because the hood part times its room curtain against it; the pieces come in once that has dropped.
-const RUN=2.6,START=.14,flow=()=>clamp(((q.meanIn*.9+q.meanRun*RUN)/(.9+RUN)-START)/(1-START));
-const flight=r=>clamp((flow()-.82*r/Math.max(1,last))/.18);
+// A dot per piece on a plain price line, stacked where they crowd: the pile on the left is "most of the set costs less".
+const ticks=[...G].sort((a,b)=>a.price-b.price);
+dots.innerHTML=ticks.map(g=>`<i style="background:${tone(g.price)}"></i>`).join('')+`<em style="left:${(mean-lo)/(hi-lo)*100}%">Average ${usd(mean)}</em><small>${money(lo)}</small><small>${money(hi)}</small>`;
+const dotEls=[...dots.querySelectorAll('i')];
 
-// One stop per piece as it stamps the mean, then the whole mean, then the two extremes.
-const stopAt=v=>v<N?S.at.meanIn[0]+((.1+.82*v/Math.max(1,last))*(1-START)+START)*(.9+RUN):v===N?S.at.mean[0]+.5:S.at.ext[0]+S.at.ext[1]*.92;
+let F={x:0,y:0,c:1},introT0=-1,countT0=-1,s=0,busy=false;
+const FLY=520,FADE=260,GAP=90,INTRO=(N-1)*GAP+FLY+FADE;
 
-S.part('mean',{segs:[['meanIn',.9],['meanRun',RUN],['mean',1],['ext',1.8]],
+S.part('mean',{segs:[['meanIn',.9],['avg',K]], // meanIn keeps its name and length: hood.js times its exit against it
   rooms:{average:{
-    stops:()=>Array.from({length:N+2},(_,v)=>stopAt(v)),
+    stops:()=>Array.from({length:K},(_,k)=>S.at.avg[0]+k+.5),
     pitch:()=>Math.max(S.w*.14,90),
-    start:N, // lands on the finished mean: the room's point, with the build one drag back
-    piece:v=>v<N?order[v]:null,
-    label:v=>v===N?`All ${N} averaged, ${cents(mean)}`:`Widest and narrowest shoulder of the ${N}`,
-    box:()=>({x:S.w*.25,y:60,w:S.w*.5,h:S.h-120}),
-    pick(){const i=S.hit();return i>=0?i:-1},
+    start:0,
+    piece:()=>null,
+    label:k=>LABELS[k],
+    box:()=>({x:F.x-F.c*.36,y:F.y,w:F.c*.72,h:F.c*HH}),
+    pick:()=>-1,
   }},
   measure(){
     const {w,h,pt}=S;
-    // Below the mean, the pieces stand in price order, cheapest first: what went in stays on the page.
-    const rows=pt?2:1,cols=Math.ceil(N/rows),pitch=(w-(pt?24:40))/cols,sc=pitch*1.46,rowH=sc*HH+(pt?6:0),rowTop=h-(pt?128:96)-rows*rowH;
-    SL=G.map((_,i)=>{const r=rank[i],row=Math.floor(r/cols),inRow=row?N-cols:cols;return {x:w/2+(r%cols-(inRow-1)/2)*pitch,y:rowTop+row*rowH,c:sc}});
-    const top=pt?44:h*.075;
-    // Full bleed across the width, capped in height so the row keeps clean paper; tracking takes up the slack.
-    word.style.letterSpacing='0';fitWidth(word,w*.985);
-    const m=document.createElement('canvas').getContext('2d');m.font='100px Six';const cap=m.measureText('H').actualBoundingBoxAscent/100||.82;
-    const max=(rowTop-(pt?16:34)-top)/cap;
-    if(parseFloat(word.style.fontSize)>max){word.style.fontSize=max+'px';word.style.letterSpacing=(w*.985-word.scrollWidth)/6+'px'}
-    word.style.transform=`translate(${w*.0075}px,${top}px)`;
-    const wordH=parseFloat(word.style.fontSize)*cap;
-    // The hood overlaps the word; the hem clears the row. Phone: the width sets the size, and the word sits above the shoulders.
-    const c=pt?w*1.4:(rowTop-10-top)/HH,y=pt?Math.max(top+wordH*.5,(rowTop-8)-c*HH):top;
-    M={x:w/2,y,c};
-    for(const cv of cvs){cv.style.width=cv.style.height=c+'px';cv.style.transform=`translate3d(${M.x-c/2}px,${M.y-c*CT}px,0)`}
-    mp.style.fontSize=c*HH*.2+'px';mp.style.transform=`translate(${M.x-mp.offsetWidth/2}px,${M.y+c*HH*.43}px)`;
-    rules.forEach(r=>{r.style.top='46px';r.style.height=h-46-(pt?72:0)+'px'});
-    // Shoulders meet at a seam so the gap between the two is the width itself. Phone: one above the other on one axis.
     if(pt){
-      const c=Math.min(w*1.1,(h-52-96)/(2*HH)),gap=c*HH;
-      E={[iWide]:{x:w/2,y:50,c},[iNarrow]:{x:w/2,y:50+gap,c}};
-      ea.style.fontSize=eb.style.fontSize=h*.12+'px';
-      ea.style.top=labs[0].style.top=56+'px';eb.style.top=labs[1].style.top=56+gap+'px';
+      // The traced stack runs to .9 of the canvas, past the average's hem, so the text starts below the lowest outline.
+      const c=Math.min(w*1.3,h*.5/HH,(w-32)/.7);F={x:w/2,y:78,c};const t=F.y-c*CT+c*.93+8;
+      Object.assign(text.style,{left:'16px',width:w-32+'px',top:t+'px',height:Math.max(120,h-t-76)+'px'});
     }else{
-      const c=h*.74/HH,aw=half(iWide)*c/1600,an=half(iNarrow)*c/1600,seam=w/2+(aw-an)/2;
-      E={[iWide]:{x:seam-aw,y:h*.075,c},[iNarrow]:{x:seam+an,y:h*.075,c}};
-      // Numerals fill the paper left of the widest shoulder, ending on its rule.
-      const fs=fitWidth(ea,seam-2*aw-20-14);eb.style.fontSize=fs+'px';ea.style.top=eb.style.top=h*.075+'px';
-      labs.forEach(l=>l.style.top=h*.075+fs*.92+8+'px');
+      const top=Math.max(76,h*.1),c=Math.min((h-top-124)/HH,(h-top-56)/.88),x=Math.max(w*.28,c*.36+24),L=x+c*.36+40;F={x,y:top,c};
+      Object.assign(text.style,{left:L+'px',width:Math.min(580,w-L-48)+'px',top:top+'px',height:c*HH+'px'});
     }
+    Object.assign(fig.style,{width:F.c+'px',height:F.c+'px',transform:`translate3d(${F.x-F.c/2}px,${F.y-F.c*CT}px,0)`});
+    priceEl.style.fontSize=F.c*HH*.3+'px';priceEl.style.transform=`translate(${F.x-priceEl.offsetWidth/2}px,${F.y+F.c*HH*.32}px)`;
+    // Dots pile up where their 12px discs would overlap.
+    const W=dots.offsetWidth||text.offsetWidth,tops=[];
+    dotEls.forEach((d,n)=>{const x=(ticks[n].price-lo)/(hi-lo)*(W-12);let k=0;while(tops[k]!==undefined&&x-tops[k]<13)k++;tops[k]=x;d.style.transform=`translate(${x}px,${-k*13}px)`});
   },
-  pre(){if(q.ext>0)S.stack=['e',i=>i===iNarrow?400:i===iWide?399:100-i];else if(q.meanIn>0)S.stack=['m',i=>200+rank[i]]},
+  pre(){
+    const here=S.room==='average';
+    s=clamp(q.avg*K-.5,0,K-1);
+    if(!here){introT0=-1;countT0=-1}
+    else{
+      if(introT0<0&&q.meanIn>=1&&s<.5)introT0=S.now;
+      if(s<3)countT0=-1;else if(countT0<0&&s>3.5)countT0=S.now;
+    }
+    if(q.meanIn>0&&!olImg.src){olImg.src='img/average-outline.webp';meanImg.src='img/average-mean.webp'}
+    if(q.meanIn>0)S.stack=['a',i=>200+rank[i]];
+  },
   pose(i,P){
     if(q.meanIn<=0)return P;
-    const r=rank[i],f=flight(r),{w,h}=S;
-    if(f<=0){ // the hood row falls with its rooms (same curve as hood.js) and uncovers the word
+    const t=introT0<0?-1:S.now-introT0-rank[i]*GAP;
+    if(t<0){ // the hood row falls with its rooms (same curve as hood.js), and a piece not yet sent stays hidden
       const e=sss(clamp(q.meanIn*2.4));
-      return {...P,y:P.y+e*h,o:e>=1?0:P.o};
+      return {...P,y:P.y+e*S.h,o:introT0<0&&e<1?P.o:0};
     }
-    // In from either side on the shared rails, one full look covering the mean, then it shrinks away to its place in the row and leaves its share behind.
-    const s=SL[i],side=r%2?-1:1,go=sss(clamp(f/.42)),off=sss(clamp((f-.5)/.5));
-    let T={x:f<.5?M.x+side*(w/2+M.c*.42)*(1-go):lerp(M.x,s.x,off),y:lerp(M.y,s.y,off),c:M.c*(s.c/M.c)**off,o:1,l:0,r:1};
-    if(q.ext>0){
-      if(i!==iWide&&i!==iNarrow){ // the row sinks from the middle out
-        const e=sss(clamp((q.ext-Math.abs(r-last/2)*.006)/.1));
-        return {...T,y:T.y+e*(h-s.y+8),o:e>=1?0:1};
-      }
-      const rise=sss(clamp(q.ext/.18)),part=sss(clamp((q.ext-.26)/.4)),e=E[i];
-      // Two pieces rise into one mean: the double exposure, then they part.
-      T={x:lerp(lerp(s.x,M.x,rise),e.x,part),y:lerp(lerp(s.y,M.y,rise),e.y,part),c:s.c*(M.c/s.c)**rise*(e.c/M.c)**part,o:i===iNarrow?lerp(lerp(1,.5,rise),1,clamp(part*3)):1,l:0,r:1};
-    }
-    return T;
+    // In from either side at the figure's size, onto the figure, then it fades and leaves its outline behind.
+    const k=sss(clamp(t/FLY)),side=S.pt&&rank[i]%2?1:-1; // on a laptop all come from the left, so none crosses the caption on the right
+    return {x:F.x+side*(S.w/2+F.c*.42)*(1-k),y:F.y,c:F.c,o:(1-clamp((t-FLY)/FADE))*(1-clamp(s*2)),l:0,r:1};
   },
   draw(){
-    const {w,h}=S;
-    // the word rises letter by letter from its own baseline, centre first
-    const split=sss(clamp((q.ext-.26)/.4)),wo=q.meanIn>.1&&split<1?1:0;vis(word,wo);
-    if(wo){
-      ls.forEach((l,n)=>{const v=sss(clamp((q.meanIn-.12-Math.abs(n-3)*.05)/.42)),y=(1-v)*116;if(l._y!==y){l._y=y;l.style.transform=y?`translate3d(0,${y}%,0)`:'none'}});
-      const d=split*Math.max(w,h);halves[0].style.transform=`translate3d(${-d}px,0,0)`;halves[1].style.transform=`translate3d(${d}px,0,0)`;
-    }
-    // Two canvases crossfade the last mean into the next while the piece on top still hides the change.
-    let k=-1;for(let r=0;r<N;r++)if(flight(r)>.3&&R[r])k=r;
-    const mix=k<0?0:clamp((flight(k)-.3)/.2),co=k<0?0:1-ss(clamp((q.ext-.1)/.14)),put=(n,r)=>{if(cvs[n]._k!==r){cvs[n]._k=r;r<0?cxs[n].clearRect(0,0,SZ,SZ):cxs[n].putImageData(R[r],0,0)}};
-    put(1,k);put(0,k-1);vis(cvs[1],mix*co);vis(cvs[0],(1-mix)*co);
-    // ledger: what just landed and what the mean is now, to the cent
-    let a=-1;for(let r=0;r<N;r++)if(flight(r)>=.5)a=r;
-    const done=flow()>=.995,kk=done?-2:a;
-    if(nMean._k!==kk){nMean._k=kk;if(done)nMean.innerHTML=holdText;else if(a>=0){const g=G[order[a]];nMean.innerHTML=`${a+1} of ${N}, ${g.brand} ${money(g.price)}<br>Mean so far ${cents(runMean[a])}`}}
-    vis(nMean,hold(a>=0?1:0,q.ext*6));
-    vis(nStat,hold((flow()-.96)*25,q.ext*6));
-    const pr=sss(clamp((flow()-.97)*33))*(1-ss(clamp(q.ext/.08)));vis(mp,pr>0?1:0);if(pr>0)mp.firstChild.style.transform=`translate3d(0,${(1-pr)*104}%,0)`;
-    const ex=hold((q.ext-.6)*4,q.priceIn*4);
-    vis(nExt,ex);
-    labs.forEach(l=>{vis(l,ex);l.style.pointerEvents=ex>.5?'auto':'none'});
-    for(const el of [ea,eb]){vis(el,ex);if(ex>0)el.firstChild.style.transform=`translate3d(0,${(1-sss(clamp((q.ext-.6)*3.2)))*100}%,0)`}
-    // Rules read the live pose, so they stay on the shoulder through the idle drift.
-    rules.forEach((el,n)=>{
-      vis(el,ex);if(ex<=0)return;
-      const i=n<2?iWide:iNarrow,P=S.live[i],x=P.x+(n%2?1:-1)*half(i)*P.c/1600;
-      el.style.transform=`translate3d(${x.toFixed(1)}px,0,0) scaleY(${ss(ex).toFixed(4)})`;
+    const on=hold_(q.meanIn>=1?1:0);
+    const it=introT0<0?(S.room==='average'?0:INTRO):S.now-introT0;
+    let landed=0;for(let r=0;r<N;r++)landed+=clamp((it-r*GAP-FLY)/FADE);
+    busy=S.room==='average'&&(it<INTRO||countT0>=0&&S.now-countT0<(K-1)*160+1000);
+    vis(fig,on);
+    // a visible child shows through a hidden parent, so each image carries the room's own fade
+    vis(olImg,on*(.35+.65*landed/N)*(1-ss(clamp(s)))); // the stack is drawn from the first frame and darkens as each piece lands on it, so step 1 never reads empty
+    vis(meanImg,on*ss(clamp(s))*(1-.75*ss(clamp(s-3))));
+    const pr=sss(clamp((s-1.4)*2.5))*(1-ss(clamp((s-2.5)*2)));
+    vis(priceEl,on*(pr>0?1:0));if(pr>0)priceEl.firstChild.style.transform=`translate3d(0,${(1-pr)*104}%,0)`;
+    vis(text,on);
+    steps.forEach((el,k)=>{
+      const o=on*clamp(1-Math.abs(s-k)*2.2),y=(k-s)*28;vis(el,o);
+      if(o>0&&el._y!==y){el._y=y;el.style.transform=y?`translate3d(0,${y.toFixed(1)}px,0)`:'none'}
     });
+    links.forEach(a=>a.style.pointerEvents=on*clamp(1-Math.abs(s-3)*2.2)>.5?'auto':'none');
+    const ct=S.room!=='average'?1e9:countT0<0?0:S.now-countT0;
+    nums.forEach((el,k)=>{const [v,f]=FINDS[k],e=1-(1-clamp((ct-k*160)/1000))**3,txt=f(k?v*e:1+(v-1)*e);if(el._t!==txt){el._t=txt;el.innerHTML=txt}});
   },
-  // Only the row is small enough to name a piece at a time.
-  hover(){return flow()>=.995&&q.ext<=0&&!S.reduced?S.hit():-1},
+  busy:()=>busy,
+  hover:()=>-1,
 });
+// Gone once Price takes over the stage.
+function hold_(o){return o*(1-clamp(q.priceIn*6))}
