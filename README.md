@@ -2,43 +2,47 @@
 
 # SOESCLOSET
 
-**Pullover Hoodies: 17 hoodies from 12 labels, $160 to $1,500, compared by hand, eye and price.**
+**17 pullover hoodies from 12 labels, $160 to $1,500, compared side by side.**
 
 [**Visit the site →**](https://soescloset.vercel.app)
 
-![The soescloset cover](docs/cover.png)
+![The soescloset home screen](docs/home.png)
 
 </div>
 
-Most fashion sites let you browse. soescloset lets you handle things. Every hoodie is cut out in one consistent style, so pieces from different labels read as one collection, and each room compares them in a different way.
+Most fashion sites let you browse. soescloset lets you compare. Every hoodie is cut out the same way, so pieces from different labels read as one collection, and each room compares them differently.
 
-## The rooms
+## Rooms
 
 | Room | What you do there |
 |---|---|
-| **Cover** | Drag across a plaster hoodie to paint its true colour back in |
-| **Walk** | Pull a rail of hanging hoodies sideways and read their swing tags |
-| **Wall** | Read price at a glance from how far each slit is dyed, then sort the set |
-| **Hood** | Pan one matching hood crop per piece, and zoom into the cloth |
-| **Average** | Meet the blended ghost of all 17 at their true average price |
-| **Price** | Line every piece up at one scale, with height set by price |
-| **Compare** | Split any two hoodies down the middle and drag the seam |
-| **Index** | Go straight to any piece, A to Z |
+| Home | Drag across a plaster hoodie to paint its color back in |
+| Closet | See all 17 at once, sort them, find one, or pick two to compare |
+| Walk | Slide a rail of hanging hoodies and read their tags |
+| Wall | Read price from how high each slit is dyed, then sort by color, price, brand or fit |
+| Price | Line every piece up at one scale, height set by price |
+| Compare | Split two hoodies down the middle and drag the seam |
+| Hood | Compare the hoods: domed or peaked, open or closed |
+| Average | All 17 traced on top of each other, plus what the numbers say |
 
-Click any hoodie, in any room, to expand it. You get its price, the store's notes, its measurements against the other 16, a comparison, and a link to the store.
+Click any hoodie in any room to open its page: price, fabric, fit, the store's notes and a link to buy.
 
 <table>
 <tr>
+<td width="50%"><img src="docs/closet.png" alt="All 17 hoodies in the Closet"></td>
 <td width="50%"><img src="docs/walk.png" alt="Hoodies hanging on the Walk rail"></td>
-<td width="50%"><img src="docs/piece.png" alt="A hoodie expanded with its details and store link"></td>
 </tr>
 <tr>
-<td><img src="docs/hood.png" alt="Matching hood crops in the Hood room"></td>
+<td><img src="docs/wall.png" alt="The Wall, with price shown as dye height"></td>
+<td><img src="docs/price.png" alt="Every hoodie at one scale in the Price room"></td>
+</tr>
+<tr>
 <td><img src="docs/compare.png" alt="A $1,500 and a $160 hoodie split side by side"></td>
+<td><img src="docs/hood.png" alt="Hood shapes compared in the Hood room"></td>
 </tr>
 <tr>
-<td><img src="docs/wall.png" alt="The Wall, with price shown as dye"></td>
 <td><img src="docs/average.png" alt="The Average room"></td>
+<td><img src="docs/piece.png" alt="A hoodie's own page with price and store link"></td>
 </tr>
 </table>
 
@@ -50,32 +54,27 @@ Aimé Leon Dore · Arc'teryx · ATON · by Parra · Casablanca · Essentials · 
 
 ## How it's built
 
-- **Plain HTML, CSS and JavaScript.** No framework and no build step.
-- **Rooms with real addresses.** Links can be shared, and back and reload land where you expect.
-- **One way to move.** Drag, wheel, swipe and arrow keys all drive the same sideways motion.
-- **One cutout pipeline.** `pipeline/` turns source photos into matched cutouts and measures each garment from the image.
-- **Real data only.** Prices and notes come from the brand and store sites. Shape figures are measured from the photos.
-- **Built for everyone.** Keyboard support, reduced motion and phone layouts are included.
+- Plain HTML, CSS and JavaScript. No framework, no build step.
+- Every room has its own URL, so links can be shared and Back works.
+- Drag, scroll, swipe and arrow keys all move the same way. Changing rooms takes a second push at the end, so you never leave a room by accident.
+- `pipeline/` turns product photos into matching cutouts and measures each garment from the image.
+- Prices and notes come from the brand and store sites. Shape numbers are measured from the photos.
+- Works on phones and with a keyboard. Motion is the same for everyone and stays light.
+- The "Suggest a hoodie" box sends links to a Google Sheet through a small Apps Script (`tools/suggest-apps-script.js`).
 
 ## Run it locally
 
 ```sh
-python3 -m http.server 8741 --directory site
+python3 -m http.server 8790 --directory site
 ```
 
-Then open http://localhost:8741. To run the checks, with that server still running:
-
-```sh
-node tools/check-site.mjs
-node tools/use-site.mjs
-```
+Then open http://localhost:8790.
 
 ## What's next
 
 - Link brand names to their pieces and sites
-- Say clearly when a link goes to a retailer rather than the brand
-- Rebuild Wall, Compare, Average and Index with more hands-on controls
-- Add more garment sections beyond pullover hoodies
+- Say clearly when a link goes to a retailer and not the brand
+- Add more garments beyond pullover hoodies
 
 ## Credits
 
