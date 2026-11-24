@@ -24,8 +24,13 @@
   #wallSort{left:auto;top:auto;right:34px;bottom:2px;transform:none;flex-direction:column;gap:0;text-align:right}
   #wallSort button{padding:7px 0 7px 16px;border:0;text-underline-offset:3px}
   #wallSort button[aria-pressed=true]{text-decoration:underline}
-  #wallCap{left:16px;right:72px}#wallCap span{white-space:normal;min-width:0}
-  #nWall{max-width:calc(100% - 110px);left:16px;bottom:10px}
+  /* v5: a fourth tab (Fit) must still fit under the hem, so the phone column packs a little tighter than the original's three. */
+  /* Round 3 audit: four 44px thumb targets, two by two, in the hem band. */
+  #wallSort{bottom:0;right:36px;display:grid;grid-template-columns:auto auto}#wallSort button{display:flex;align-items:center;justify-content:flex-end;min-width:44px;min-height:44px;padding:0 0 0 14px;line-height:16px}
+  #wallCap{left:16px;right:142px}#wallCap span{white-space:normal;min-width:0}
+  /* The corner bar takes the bottom row; caption and tabs sit on it. */
+  #wallSort{bottom:56px}
+  #nWall{max-width:calc(100% - 166px);left:16px;bottom:64px}
   /* The phone rail pans under the ruler, so the ruler stands on its own paper. */
   #wallRule{font-size:11px}#wallRule::before{content:"";position:absolute;inset:0 0 -200px;background:var(--paper)}#wallRule span{right:3px}
 }

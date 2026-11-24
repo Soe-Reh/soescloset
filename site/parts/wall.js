@@ -1,5 +1,6 @@
-import {S,$,G,clamp,ss,sss,lerp,mix,mixc,hold,vis,add,money,hex,lum,WHITE,BLACK,HH,CT} from '../core.js';
-const {q,N,last,reduced}=S;
+import {S,$,G,clamp,ss,sss,lerp,mix,mixc,hold,vis,add,money,hex,lum,contrast,WHITE,BLACK,HH,CT,sharpen} from '../core.js';
+import {roomBar} from '../mover.js';
+const {q,N,last}=S;
 const touch=!matchMedia('(hover:hover)').matches;
 const note=add(`<p class="note" id="nWall">${touch?'One slit from each. The higher the dye, the dearer.<br>Drag to scan, tap for the piece, hold to pull one out':'One slit from each. The higher the dye, the dearer.<br>Move across to open one, click for the piece, pull it out to hold it'}.</p>`);
 const key=$('wallKey'),sorter=$('wallSort'),ring=add('<div id="wallRing" aria-hidden="true"></div>');key.max=last;
@@ -14,11 +15,14 @@ const prices=G.map(g=>g.price),lo=Math.min(...prices),hi=Math.max(...prices);
 const level=p=>hi>lo?Math.log(p/lo)/Math.log(hi/lo):1;
 const SLITS=4.6,CUFF=1240/1600,HEM=1338/1600,yAt=e=>lerp(CUFF,CT,e);
 
-const order=G.map((_,i)=>i),slot=G.map((_,i)=>i),SORTS={Colour:(a,b)=>a-b,Price:(a,b)=>G[a].price-G[b].price||a-b,Brand:(a,b)=>G[a].brand.localeCompare(G[b].brand)||G[a].price-G[b].price};
+const order=G.map((_,i)=>i),slot=G.map((_,i)=>i),SORTS={Color:(a,b)=>a-b,Price:(a,b)=>G[a].price-G[b].price||a-b,Brand:(a,b)=>G[a].brand.localeCompare(G[b].brand)||G[a].price-G[b].price,
+  Fit:(a,b)=>G[a].fitRank-G[b].fitRank||G[a].price-G[b].price}; // v5: Fit tab (core.js g.fitRank) and US spelling, the only changes to the original's sorts
 const lay=[],open=G.map(()=>0),flood=G.map(g=>1),off=G.map(()=>({x:0,v:0,wait:0}));
-let F=0,A=0,keyed=false,wallOn=false,inWall=false,pin=null,pinT=0,gut=52,c=1,y0=0,sortN=0;
+let F=0,A=0,keyed=false,wallOn=false,inWall=false,pin=null,pinT=0,pinMx=null,barAt=-1,gut=52,c=1,y0=0,sortN=0;
 // The crown starts below the nav's own boxes: the index part inks any word a garment reaches, and this cloth never does.
-const size=()=>{const {h,w}=S,top=$('stage').getBoundingClientRect().top;gut=w<=760?30:52;y0=Math.max(h*.058,...[...$('nav').children].map(a=>a.getBoundingClientRect().bottom-top+6));c=(h*.898-y0)/HH};
+const size=()=>{const {h,w}=S,top=$('stage').getBoundingClientRect().top;gut=w<=760?30:52;y0=Math.max(h*.058,...[...$('nav').children].map(a=>a.getBoundingClientRect().bottom-top+6));c=(h-band()-y0-(w<=760?56:0))/HH};
+// The strip under the hem holds the caption and the corner bar, so a short screen (a phone on its side) still gets enough of it.
+const band=()=>Math.max(S.h*.102,84);
 
 function layoutSlots(){
   // Phone: squeezing every slit into the width leaves slits nobody can read. Here they keep a readable width on a rail that pans, and the open one widens.
@@ -58,10 +62,10 @@ let cast=()=>{cast=()=>{};
     const g=G[i];
     if(out){const cv=document.createElement('canvas');cv.width=cv.height=out.width;cv.setAttribute('aria-hidden','true');cv.getContext('2d').drawImage(out,0,0);out.close();g.el.append(cv);g.pl=cv;g.plAt=performance.now()}else console.error(g.id,err);
     // The cast has fetched the full image anyway, and 600 is soft on a wall this tall.
-    if(!g.hi){g.hi=true;const im=new Image();im.src=g.image;im.decode().then(()=>{g.ct.src=im.src}).catch(()=>{})}
+    sharpen(g); // core swaps it in once the room is at rest
     next(i+1);
   };
-  next(0);
+  S.smallIn.then(()=>next(0)); // after every small picture, so the casts never hold up a garment
 };
 
 // Spring state of the one piece out of the rail.
@@ -92,11 +96,11 @@ function bigPrice(g){
 }
 function lift(i,x,y,by){
   const s=slot[i],[cx]=lay[s],gx=clamp(x-cx,-c*.3,c*.3),gy=clamp(y-y0,0,c*.75);
-  L.i=i;L.on=true;L.by=by;L.ux=.5+gx/c;L.uy=CT+gy/c;L.ax=L.hx=x;L.ay=L.hy=y;L.tx=x;L.ty=y;L.vx=L.vy=0;L.vy=reduced?0:-160;L.c=c;L.cv=0;L.a=0;L.va=0;L.o=0;L.ov=0;
+  L.i=i;L.on=true;L.by=by;L.ux=.5+gx/c;L.uy=CT+gy/c;L.ax=L.hx=x;L.ay=L.hy=y;L.tx=x;L.ty=y;L.vx=L.vy=0;L.vy=-160;L.c=c;L.cv=0;L.a=0;L.va=0;L.o=0;L.ov=0;
   L.gx=gx;L.slotY=y0+gy;L.px=x;L.py=y;L.pvx=L.pvy=0;L.pt=performance.now();
   snapshot();bigPrice(G[i]);stage.classList.add('wall-held');
 }
-function drop(){if(!L.on)return;L.on=false;stage.classList.remove('wall-held');if(!reduced){L.vx+=clamp(L.pvx,-2600,2600)*.75;L.vy+=clamp(L.pvy,-2600,2600)*.75}}
+function drop(){if(!L.on)return;L.on=false;stage.classList.remove('wall-held');L.vx+=clamp(L.pvx,-2600,2600)*.75;L.vy+=clamp(L.pvy,-2600,2600)*.75}
 const local=e=>{const r=stage.getBoundingClientRect();return [e.clientX-r.left,e.clientY-r.top]};
 const slotAt=x=>{for(let s=0;s<N;s++)if(x<lay[s][0]+lay[s][1]/2)return s;return last};
 
@@ -107,11 +111,11 @@ stage.addEventListener('pointerdown',e=>{
   const sl=slotAt(x),go=()=>{lift(order[sl],x,y,'p');stage.setPointerCapture?.(e.pointerId)};
   if(e.pointerType==='mouse')return go();
   // A touch only lifts after a still press, so a drag across still scans and a swipe still scrolls.
-  pin=S.pt?sl:clamp(x/(S.w-gut)*N-.5,0,last);pin0=pin;x0=x;pinT=S.tp;clearTimeout(hold_);hold_=setTimeout(go,200);
+  pin=S.pt?sl:clamp(x/(S.w-gut)*N-.5,0,last);pin0=pin;pinMx=null;x0=x;pinT=S.tp;clearTimeout(hold_);hold_=setTimeout(go,200);
 });
 stage.addEventListener('pointermove',e=>{
   const [x,y]=local(e);
-  if(e.pointerType!=='mouse'&&!L.on){if(wallOn&&y>y0){pin=S.pt&&x0!==null?clamp(pin0-(x-x0)/((S.w-gut)/SLITS),0,last):clamp(x/(S.w-gut)*N-.5,0,last);pinT=S.tp}clearTimeout(hold_)}
+  if(e.pointerType!=='mouse'&&!L.on){if(wallOn&&y>y0){pin=S.pt&&x0!==null?clamp(pin0-(x-x0)/((S.w-gut)/SLITS),0,last):clamp(x/(S.w-gut)*N-.5,0,last);pinT=S.tp;pinMx=null}clearTimeout(hold_)}
   if(L.on&&L.by==='p'){const n=performance.now(),d=Math.max(8,n-L.pt)/1000;L.pvx+=((x-L.px)/d-L.pvx)*.45;L.pvy+=((y-L.py)/d-L.pvy)*.45;L.px=x;L.py=y;L.pt=n;L.tx=x;L.ty=y}
 });
 const end=()=>{clearTimeout(hold_);x0=null;if(L.by==='p'){if(performance.now()-L.pt>90)L.pvx=L.pvy=0;drop()}};
@@ -137,7 +141,7 @@ sorter.addEventListener('click',e=>{
   order.sort(SORTS[b.dataset.s]);order.forEach((i,s)=>slot[i]=s);
   if(!free())F=slot[L.i]; // a piece still out keeps its slit open, wherever the slit went
   layoutSlots();sortN++;
-  G.forEach((_,i)=>{const o=off[i];o.x=reduced?0:before[i]-lay[slot[i]][0];o.v=0;o.wait=reduced?0:slot[i]*11;o.z=Math.abs(o.x)});
+  G.forEach((_,i)=>{const o=off[i];o.x=before[i]-lay[slot[i]][0];o.v=0;o.wait=slot[i]*11;o.z=Math.abs(o.x)});
   valueText();
 });
 
@@ -152,29 +156,34 @@ function ruler(){
 let bw=0,bx=0;
 const bigX=()=>{const room=S.w-gut;return bw>room*.72?(room-bw)/2:L.ax>room/2?14:room-bw-14};
 const stepS=(v,to,x,k,cc,d)=>{const nv=v+(-k*(x-to)-cc*v)*d;return [x+nv*d,nv]};
-let capI=-1,capW=0,rO=0,capX=null;
+// The corner bar steps the slits like a rail's; a stepped slit stays open until the mouse moves again.
+const bar=roomBar('wall',{n:N,step(d){const s=clamp(Math.round(F)+d,0,last);pin=s;pinT=S.tp;pinMx=S.mx;key.value=s;valueText();S.wake()}});
+let capI=-1,capW=0,rO=0,capX=null,wf=0,tcol=null; // wf,tcol: v5 flood
 
 S.part('wall',{segs:[['wallIn',1.1],['wall',2.4]],
   rooms:{wall:{
     at:()=>S.at.wall[0],
+    bar,
     pick(){if(S.my<y0||S.my>y0+c*HH||S.mx>S.w-gut)return -1;return order[slotAt(S.mx)]},
     now:()=>free()&&A<.5?-1:idxNow(),
   }},
-  measure(){size();if(G.length)ruler();const b=S.h*.102;cap.style.setProperty('--capfs',Math.min(b-14,84)+'px');cap.style.bottom='9px'},
+  measure(){size();if(G.length)ruler();const b=band();cap.style.setProperty('--capfs',Math.min(b-14,84)+'px');cap.style.bottom=(S.w<=760?65:9)+'px'},
   pre(){
     if(!c)size();
     if(S.p>S.at.wallIn[0]-2&&q.hoodIn<1)cast();
     wallOn=q.wallIn>.8&&q.hoodIn<.05;
     if(!wallOn&&L.i>=0){L.i=-1;L.on=false;L.r=0;L.o=0;stage.classList.remove('wall-held')}
     inWall=S.inside&&S.my>y0&&S.my<y0+c*HH&&S.mx<S.w-gut;
+    if(pinMx!==null&&Math.abs(S.mx-pinMx)>4){pin=null;pinMx=null}
     if(pin!==null&&(Math.abs(S.tp-pinT)>.05||!wallOn))pin=null;
         const k=1-Math.exp(-S.dt*.0075);
     // While a piece is out, its slot stays where it was so it has a home to return to.
     if(free()){
       const fT=keyed&&wallOn?+key.value:pin!==null?pin:wallOn&&inWall?clamp(S.mx/(S.w-gut)*N-.5,0,last):F;
       const aT=wallOn&&(inWall||keyed||pin!==null)?1:0;
-      if(reduced||S.jump){F=fT;A=aT}else{F+=(fT-F)*k;A+=(aT-A)*k}
+      if(S.jump){F=fT;A=aT}else{F+=(fT-F)*k;A+=(aT-A)*k}
     }
+    {const b=Math.round(clamp(F,0,last));if(b!==barAt){barAt=b;bar.set(b)}}
     if(q.wallIn>0&&(q.meanIn<1||!lay.length))layoutSlots();
 
     const d=Math.min(S.dt/1000,1/30);
@@ -183,12 +192,11 @@ S.part('wall',{segs:[['wallIn',1.1],['wall',2.4]],
 
     // Dye rises fast into an opening slit and sinks back slowly, like cloth drawing up and draining.
     G.forEach((g,i)=>{const r=level(g.price),o=open[i],t=i===L.i&&!free()?1:r+(1-r)*Math.min(1,o*o*(S.pt?2.2:1.45));
-      if(reduced||S.jump)flood[i]=t;else flood[i]+=(t-flood[i])*(1-Math.exp(-S.dt*(t>flood[i]?.0095:.0034)))});
+      if(S.jump)flood[i]=t;else flood[i]+=(t-flood[i])*(1-Math.exp(-S.dt*(t>flood[i]?.0095:.0034)))});
 
     if(L.i>=0){
       const tx=L.on?L.tx:lay[slot[L.i]][0]+L.gx,ty=L.on?L.ty:L.slotY,kp=L.on?190:62,cp=L.on?25:10.5;
-      if(reduced){L.ax=tx;L.ay=ty;L.vx=L.vy=0;L.a=0;L.va=0;L.o=L.on?1:0;L.c=L.on?liftC():c;L.r=L.on?1:0}
-      else{
+      {
         [L.ax,L.vx]=stepS(L.vx,tx,L.ax,kp,cp,d);[L.ay,L.vy]=stepS(L.vy,ty,L.ay,kp,cp,d);
         // Grabbed off centre the garment hangs from the grip; moving, its mass trails the hand.
         const dist=Math.hypot(tx-L.ax,ty-L.ay),aT=(L.on?hang():0)+clamp(L.vx*.011,-24,24);
@@ -198,9 +206,13 @@ S.part('wall',{segs:[['wallIn',1.1],['wall',2.4]],
         L.r+=((L.on?1:0)-L.r)*(1-Math.exp(-S.dt*(L.on?.011:.008)));
         if(!L.on&&dist<.6&&Math.abs(L.a)<.06&&L.o<.012&&Math.hypot(L.vx,L.vy)<8&&Math.abs(L.va)<.4&&L.r<.02){L.i=-1;L.r=0;L.o=0}
       }
-      if(reduced&&!L.on){L.i=-1}
     }
-    const white=sss(clamp(q.wallIn*1.6));S.gr=mixc(S.gr,WHITE,white);S.ink=mixc(S.ink,BLACK,white);
+    const white=sss(clamp(q.wallIn*1.6))*(1-sss(clamp((q.hoodIn||0)*1.6))); // the plaster is the Wall's alone: it drains back to studio gray on the way out, so Hood, Price, Compare and Average share the grayS.gr=mixc(S.gr,WHITE,white);S.ink=mixc(S.ink,BLACK,white);
+    // v5 addition: the open or held piece floods the white wall with its own room colour (g.tint), then drains back to white.
+    const fi=idxNow(),amt=wallOn?(free()?clamp(A*1.5-.3):1):0,ek=S.jump?1:1-Math.exp(-S.dt*.006);
+    if(amt>.01){const to=G[fi].tint;tcol=tcol?mixc(tcol,to,ek):to}
+    wf+=(amt-wf)*ek;
+    if(tcol&&wf>.002){S.gr=mixc(S.gr,tcol,wf);const ti=G[fi].tintInk;S.ink=contrast(S.gr,ti)>contrast(S.gr,BLACK)?ti:BLACK}
     if(q.wallIn>.5&&q.hoodIn<.5){const held=L.i;S.stack=[`w${sortN}.${held}`,i=>i===held?300:Math.min(190,10+(off[i].z||0)*.1+(N-slot[i])*.01)|0||1]}
   },
   pose(i,P){
@@ -230,14 +242,14 @@ S.part('wall',{segs:[['wallIn',1.1],['wall',2.4]],
     });
 
     if(L.i>=0){
-      const g=G[L.i],s=L.c/1600,ang=L.a*(reduced?0:1);
+      const g=G[L.i],s=L.c/1600,ang=L.a;
       g.el.style.transform=`translate3d(${L.ax.toFixed(2)}px,${L.ay.toFixed(2)}px,0) rotate(${ang.toFixed(3)}deg) scale(${s.toFixed(5)}) translate(${(-L.ux*1600).toFixed(1)}px,${(-L.uy*1600).toFixed(1)}px)`;
       const up=clamp(L.o);g.sh.style.transform=up>.002?`translate(${(up*34).toFixed(1)}px,${(up*64).toFixed(1)}px)`:'';
     }
     if(rO!==rack||rack>0){rO=rack;
       vis(racks[0],clamp(rack*2.4));vis(racks[1],clamp(rack*2.2-1.1));
       if(rack>0){const t=`scale(${(1-.018*sss(rack)).toFixed(4)})`;racks[0].style.transform=t;racks[1].style.transform=t}
-      const bo=S.w<=760?0:clamp(rack*2-.7);vis(big,bo);bx+=(bigX()-bx)*(reduced?1:1-Math.exp(-S.dt*.005));if(bo>0)big.style.transform=`translate3d(${bx.toFixed(1)}px,${(+big.dataset.y+(1-sss(bo))*S.h*.05).toFixed(1)}px,0)`;
+      const bo=S.w<=760?0:clamp(rack*2-.7);vis(big,bo);bx+=(bigX()-bx)*(1-Math.exp(-S.dt*.005));if(bo>0)big.style.transform=`translate3d(${bx.toFixed(1)}px,${(+big.dataset.y+(1-sss(bo))*S.h*.05).toFixed(1)}px,0)`;
     }
 
     const capO=inO*clamp(Math.max(A,free()?0:1)*3-1.4);
@@ -247,7 +259,7 @@ S.part('wall',{segs:[['wallIn',1.1],['wall',2.4]],
       if(capI!==idx){capI=idx;capB.textContent='$'+lg.label;capT.innerHTML=`<strong>${lg.brand}</strong><br>${lg.short}${lg.col?', '+lg.col.toLowerCase():''}`;capW=cap.offsetWidth}
       const [cx,b]=lay[slot[idx]],maxX=S.w-(S.w<=760?108:gut)-capW-6;
       const px=S.w<=760?0:rack>.5?clamp(bx+bw-capW,8,S.w-capW-8):clamp(cx-b/2+off[idx].x,8,Math.max(16,maxX));
-      capX=capX===null||reduced?px:capX+(px-capX)*(1-Math.exp(-S.dt*.014));
+      capX=capX===null?px:capX+(px-capX)*(1-Math.exp(-S.dt*.014));
       cap.style.transform=`translate3d(${capX.toFixed(1)}px,0,0)`;
     }
 
